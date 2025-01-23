@@ -1,0 +1,29 @@
+{
+  "name": "ardour_ai_backend",
+  "version": "1.0.0",
+  "description": "backend for Ardour Ai application",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leon-ronaldo/Ardour-AI.git"
+  },
+  "author": "Leon Ronaldo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leon-ronaldo/Ardour-AI/issues"
+  },
+  "homepage": "https://github.com/leon-ronaldo/Ardour-AI#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "express-async-handler": "^1.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "nodemon": "^3.1.9"
+  }
+}
