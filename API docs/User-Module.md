@@ -13,7 +13,7 @@
 {
     "email": "string",
     "password": "string",
-}`
+}
 ```
 
 
@@ -23,7 +23,7 @@
 {
     "accessToken": "string",
     "refreshToken": "string",
-}`
+}
 ```
 
 
@@ -45,7 +45,7 @@
     "email": "string",
     "password": "string",
     "phone": "string"
-}`
+}
 ```
 
 
@@ -55,7 +55,7 @@
 {
     "accessToken": "string",
     "refreshToken": "string",
-}`
+}
 ```
 
 
@@ -76,7 +76,6 @@
 curl -X GET http://your-api-url/current-user \
 -H "Authorization: Bearer <your-access-token>" \
 -H "Content-Type: application/json"
-`
 ```
 
 
@@ -86,7 +85,7 @@ curl -X GET http://your-api-url/current-user \
 {
     "message": "string",
     "user": "user object"
-}`
+}
 ```
 
 
