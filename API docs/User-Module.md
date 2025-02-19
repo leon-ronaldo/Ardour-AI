@@ -8,7 +8,6 @@
 
 ### Method - Login
 #### requires
-###### ```markdown
 ```json
 {
     "email": "string",
@@ -18,7 +17,6 @@
 
 
 #### responses
-###### ```markdown
 ```json
 {
     "accessToken": "string",
@@ -38,7 +36,6 @@
 
 ### Method - Register
 #### requires
-###### ```markdown
 ```json
 {
     "userName": "string",
@@ -50,7 +47,6 @@
 
 
 #### responses
-###### ```markdown
 ```json
 {
     "accessToken": "string",
@@ -71,7 +67,7 @@
 
 ### Method - CurrentUser
 #### requires (authorized get request)
-###### ```markdown
+######
 ```bash
 curl -X GET http://your-api-url/current-user \
 -H "Authorization: Bearer <your-access-token>" \
@@ -80,16 +76,13 @@ curl -X GET http://your-api-url/current-user \
 
 
 #### responses
-###### ```markdown
+######
 ```json
 {
     "message": "string",
     "user": "user object"
 }
 ```
-
-
-#### response codes
 | status code | response field | response data | cause |
 |-------------|----------------|---------------|-------|
 | 404 | message | User not found | Missing user |
