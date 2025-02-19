@@ -3,9 +3,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/UserModel");
 
-//@desc Register a user
-//@route POST /users/register
-//@access public
 const registerUser = asyncHandler(async (req, res) => {
   const { userName, email, password, phone } = req.body;
   
@@ -45,10 +42,6 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
-
-//@desc Login user
-//@route POST /users/login
-//@access public
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body; //email login, change to userName or anything as per your wish
 
@@ -81,11 +74,36 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
+const googleLogin = asyncHandler(async (req, res) => {
+  const { email } = req.body; //email login, change to userName or anything as per your wish
 
-//optional recommended to use your own logic
-//@desc Current user info
-//@route POST /users/current
-//@access private
+  if (!email) {
+    res.status(401).json({ message: "All fields are mandatory!" })
+    return
+  }
+
+  let user = await User.findOne({ email: email });
+
+  if (!user) {
+    user = await User.create(req.body)
+
+    if (!user) {
+      res.status(501).json({ error: "internal server error try again" });
+      return
+    };
+  }
+
+  const accessToken = jwt.sign(
+    { userId: user._id, email: user.email }, 'your secret here', { expiresIn: '1d' } //consider adding secret via .env file
+  );
+
+  const refreshToken = jwt.sign(
+    { userId: user._id, email: user.email }, 'your different secret here', { expiresIn: '7d' } //consider adding secret via .env file
+  );
+
+  res.status(200).json({ accessToken: accessToken, refreshToken: refreshToken, _id: user._id })
+});
+
 const currentUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.userId);
 
@@ -96,4 +114,4 @@ const currentUser = asyncHandler(async (req, res) => {
   res.status(200).json({ message: 'user success', 'user': user });
 });
 
-module.exports = { registerUser, loginUser, currentUser }
+module.exports = { registerUser, loginUser, currentUser, googleLogin }
