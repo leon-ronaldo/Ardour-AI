@@ -1,28 +1,23 @@
 const mongoose = require('mongoose');
 
-// Modify your user model here
 const userSchema = mongoose.Schema(
   {
-    userName: {
-        type: String,
-        required: [true, 'username is missing'],
-    },
-    email: {
-        type: String,
-        required: [true, 'email id is missing'],
-    },
-    phone: {
-        type: String,
-        required: [true, 'phone is missing'],
-    },
+    userName: { type: String, required: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: String,
     password: String,
-  }, 
+    contacts: Array,
+    profilePic: String,
+    chats: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chat' }],
+    isOnline: { type: Boolean, default: false },  // Track user online status
+  },
   {
     timestamps: true,
   }
 );
 
-// Check if the model already exists to prevent redefining
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
 
 module.exports = User;
