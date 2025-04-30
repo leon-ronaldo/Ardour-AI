@@ -98,7 +98,7 @@ class ChatPageView extends GetView<ChatPageController> {
                         alignment: Alignment.centerRight,
                         child: FTContainer(
                           child: Text(
-                            controller.chats.elementAt(index),
+                            "controller.chats.elementAt(index)",
                             style: TextStyle(
                               color: chatBubbleColors[controller
                                               .bgColorCounter.value] ==

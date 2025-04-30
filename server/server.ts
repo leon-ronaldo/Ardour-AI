@@ -1,31 +1,27 @@
-// Basic Express.js server
-import express, { Request, Response } from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-// import connectDb from './config/dbConnection';
+import WebSocket, { WebSocketServer } from 'ws';
+import connectDb from './config/dbConnection';
+import AppRoutes from './types/router';
 
-const app = express();
+const wss = new WebSocket.Server({ port: 8055 });
 
 // DB config
 // connectDb(); // Uncomment this after adding connection to DB
 
-// Middleware
-app.use(express.json());
-import UserRoutes from './routes/UserRoutes';
-app.use('/User', UserRoutes);
+wss.on('connection', (ws: WebSocket, req) => {
+    console.log('New client connected');
 
-
-
-// Routes (Add your routes here)
-// Example: app.use('/api', require('./routes/apiRoutes'));
-
-// Server starting
-app.get('/', (req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'index.html')); // Adjust the path to match your file's location
+    const route = AppRoutes[(req.url ?? "").split("/")[1]];
+    
+    if (!route) {
+        ws.send("invalid url")
+        ws.close()
+    } else {
+        route(ws, req)
+    }
+    
+    ws.on('close', () => {
+        console.log('Client disconnected');
+    });
 });
 
-// Start the server
-const PORT = 8055;
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+export default wss
