@@ -2,14 +2,14 @@ import mongoose from 'mongoose'
 
 const connectDb = async () => {
     try {
-    const connection = await mongoose.connect("mongodb srv string here!!");
-    console.log(
-        "Database connected: ",
-        connect.connection.host,
-        connect.connection.name
-    );
+        const connection = await mongoose.connect("mongodb://localhost:27017");
+        console.log(
+            "Database connected: ",
+            connection.connection.host,
+            connection.connection.name
+        );
     } catch (err) {
-    console.error(err);
+        console.error(err);
     }
 };
 
