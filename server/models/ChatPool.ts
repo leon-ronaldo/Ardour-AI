@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import crypto from "crypto";
 
 export interface IChatMessage {
   from: string;
@@ -32,4 +33,16 @@ const ChatPoolSchema = new Schema<IChatPool>({
 
 const ChatPool = mongoose.model<IChatPool>("ChatPool", ChatPoolSchema);
 
+
+function generateChatId(u1: string, u2: string, t1: string, t2: string): string {
+  const [a, b] = [u1, u2].sort();
+  const [ta, tb] = [t1, t2].sort();
+  const baseHash = crypto.createHash("md5").update(a + b).digest("hex").slice(0, 10);
+  const timeBits = (ta + tb).replace(/\D/g, "").slice(-6); // only digits
+  return baseHash + timeBits; // 10 + 6 = 16 characters
+}
+
+export {
+  generateChatId
+}
 export default ChatPool;

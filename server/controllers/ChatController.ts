@@ -1,52 +1,83 @@
-import WebSocket from "ws"
-import { WSChatMessage } from "../utils/types"
+import { WSChatRequest, WSChatResponse } from "../utils/types"
 import clientManager from "../utils/clientManager";
 import WebSocketResponder from "../utils/WSResponder";
 import { ErrorCodes } from "../utils/responseCodes";
-import USERS from "../data/Users";
-import ChatPool from "../models/ChatPool";
-import crypto from "crypto";
+// import USERS from "../data/Users";
+import ChatPool, { IChatMessage, generateChatId } from "../models/ChatPool";
+import UserModel from "../models/User";
 
-function generateChatId(u1: string, u2: string, time1: string, time2: string): string {
-    const [a, b] = [u1, u2].sort();
-    const hash = crypto.createHash("md5").update(a + b).digest("hex").slice(0, 8);
-    const ts1 = time1.slice(-4);
-    const ts2 = time2.slice(-4);
-    return hash + ts1 + ts2;
-}
+async function sendMessage(message: WSChatRequest, responseHandler: WebSocketResponder) {
+    const data = message.data as { to: string; message: string };
 
-async function sendMessage(message: WSChatMessage, responseHandler: WebSocketResponder) {
-    // search for user
-    const data = message.data as { to: string, message: string };
-    const liveClient = clientManager.getClient(data.to)
-    const client = USERS.get(data.to)
+    const recipientId = data.to;
 
-    if (!client) {
+    // Step 1: Fetch recipient user
+    const recipient = await UserModel.findById(recipientId);
+    if (!recipient) {
         responseHandler.sendMessageFromCode(ErrorCodes.USER_NOT_FOUND);
-        return
+        return;
     }
 
-    const chatId = generateChatId(responseHandler.id!, data.to, USERS.get(responseHandler.id!)?.createdOn!, USERS.get(data.to)?.createdOn!)
-    const chatPool = await ChatPool.findOne({ chatId: chatId })
+    // Step 2: Generate consistent chatId
+    const chatId = generateChatId(
+        responseHandler.user!._id.toString(),
+        recipientId,
+        responseHandler.user!.createdOn.toISOString(),
+        recipient.createdOn.toISOString()
+    );
 
-    if (!liveClient) {
-        // save in chatpool
-        return
+    // Step 3: Create message
+    const newMessage: IChatMessage = {
+        from: responseHandler.user!._id.toString(),
+        to: recipientId,
+        message: data.message,
+        timestamp: Date.now()
+    };
+
+    // Step 4: Check if recipient is online
+    const liveClient = clientManager.getClient(recipientId);
+    if (liveClient) {
+        const incomingMessage: WSChatResponse = {
+            type: "Chat",
+            resType: "PRIVATE_CHAT_MESSAGE",
+            data: {
+                from: responseHandler.user!._id.toString(),
+                message: data.message,
+                to: recipientId,
+                timestamp: Date.now()
+            }
+        };
+
+        console.log("brooo", liveClient);
+
+        liveClient.send(JSON.stringify({ data: incomingMessage }));
     }
 
-    const sendMessage: WSChatMessage = {
-        type: "Chat",
-        reqType: "RECEIVE_MSG",
-        data: {
-            from: responseHandler.id!,
-            message: data.message,
-            timestamp: new Date().toISOString()
-        }
-    }
+    // Step 5. store in chatpool
+    let chatPool = await ChatPool.findOne({ chatId });
 
-    liveClient.send(JSON.stringify(sendMessage))
+    console.log(chatPool);
+
+    if (!chatPool) {
+        // Create new chat pool
+        chatPool = new ChatPool({
+            chatId,
+            participants: [responseHandler.user!._id.toString(), recipientId].sort(),
+            messages: [newMessage]
+        });
+
+        console.log("gotha", chatPool);
+
+        await chatPool.save();
+    } else {
+        chatPool.messages.push(newMessage);
+        await chatPool.save();
+
+        console.log("ada dei", chatPool)
+    }
 }
 
-export {
+
+export default {
     sendMessage
 }

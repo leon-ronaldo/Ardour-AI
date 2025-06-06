@@ -3,8 +3,8 @@ const readline = require('readline');
 
 const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODQxMzMwMmVkOTQxMmVjNWMwYWYzNjUiLCJlbWFpbCI6ImpvaG4uZG9lQGV4YW1wbGUuY29tIiwiaWF0IjoxNzQ5MTI5MDI1LCJleHAiOjE3NDkyMTU0MjV9.gyk0-n2ZITtSslfuWmX4kuPZMAiTFBOf5eTShkni1dI"; // Replace with actual userID
 const token2 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODQxMzMwMmVkOTQxMmVjNWMwYWYzNjYiLCJlbWFpbCI6ImphbmUuc21pdGhAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDkxODI4ODIsImV4cCI6MTc0OTI2OTI4Mn0.wnMdw-mOYwzHNh_c1KCHMYyuex2o1PpF8e4EmvVBpRA"
-const ws = new WebSocket(`ws://localhost:8055/?token=${token}`);
-const clientUserId = "68413302ed9412ec5c0af365"
+const ws = new WebSocket(`ws://localhost:8055/?token=${token2}`);
+const clientUserId = "68413302ed9412ec5c0af366"
 
 const SuccessCodes = {
   CONNECTION_SUCCESSFUL: 2000,
