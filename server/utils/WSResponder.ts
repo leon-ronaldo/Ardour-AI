@@ -1,12 +1,13 @@
 import WebSocket from "ws";
 import { ErrorCodes, SuccessCodes } from "./responseCodes";
+import { IUser } from "../models/User";
 
 class WebSocketResponder {
-  public id: string | undefined;
-  constructor(private ws: WebSocket, id?: string) { }
+  public user: IUser | undefined;
+  constructor(private ws: WebSocket, user?: IUser) { }
 
-  setId(id: string) { 
-    this.id = id;
+  setUser(user: IUser) {
+    this.user = user;
   }
 
   send(data: any) {
