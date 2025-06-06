@@ -4,9 +4,10 @@ const ErrorCodes = {
     USER_NOT_FOUND: 4004,
     UNKNOWN_ACTION_TYPE: 4005,
     INTERNAL_SERVER_ERROR: 500,
-  };
-  
-  
+    GROUP_NOT_FOUND: 4006,
+};
+
+
 
 const SuccessCodes = {
     CONNECTION_SUCCESSFUL: 2000

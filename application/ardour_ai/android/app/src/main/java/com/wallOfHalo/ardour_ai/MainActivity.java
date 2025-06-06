@@ -1,4 +1,4 @@
-package com.Dadcode.ardour.ai.ardour_ai;
+package com.wallOfHalo.ardour_ai;
 
 import io.flutter.embedding.android.FlutterActivity;
 

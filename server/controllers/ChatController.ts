@@ -5,9 +5,10 @@ import { ErrorCodes } from "../utils/responseCodes";
 // import USERS from "../data/Users";
 import ChatPool, { IChatMessage, generateChatId } from "../models/ChatPool";
 import UserModel from "../models/User";
+import GroupChatPool, { IGroupChatMessage } from "../models/GroupChatPool";
 
 async function sendMessage(message: WSChatRequest, responseHandler: WebSocketResponder) {
-    const data = message.data as { to: string; message: string };
+    const data = message.data as IChatMessage;
 
     const recipientId = data.to;
 
@@ -77,7 +78,50 @@ async function sendMessage(message: WSChatRequest, responseHandler: WebSocketRes
     }
 }
 
+async function sendGroupMessage(message: WSChatRequest, responseHandler: WebSocketResponder) {
+    const data = message.data as IGroupChatMessage;
+
+    const { groupId, message: msgContent } = data;
+    const senderId = responseHandler.user!._id.toString();
+
+    // Step 1: Find GroupChatPool
+    const groupPool = await GroupChatPool.findOne({ groupId });
+
+    if (!groupPool) {
+        responseHandler.sendMessageFromCode(ErrorCodes.GROUP_NOT_FOUND);
+        return;
+    }
+
+    // Step 2: Create new group message
+    const newMessage: IGroupChatMessage = {
+        from: senderId,
+        groupId,
+        message: msgContent,
+        timestamp: Date.now(),
+    };
+
+    // Step 3: Broadcast message to all participants (except sender)
+    for (const memberId of groupPool.participants) {
+        if (memberId === senderId) continue;
+
+        const client = clientManager.getClient(memberId);
+        if (client) {
+            const response: WSChatResponse = {
+                type: "Chat",
+                resType: "GROUP_CHAT_MESSAGE",
+                data: newMessage,
+            };
+
+            client.send(JSON.stringify({ data: response }));
+        }
+    }
+
+    // Step 4: Store in DB
+    groupPool.messages.push(newMessage);
+    await groupPool.save();
+}
 
 export default {
-    sendMessage
+    sendMessage,
+    sendGroupMessage
 }

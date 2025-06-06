@@ -30,8 +30,8 @@ function chatRouter(responder: WebSocketResponder, message: WSChatRequest) {
     switch (message.reqType) {
         case "SEND_MSG":
             return chatOperations.sendMessage(message, responder)
-        case "FETCH_HISTORY":
-            return
+        case "SEND_GROUP_MSG":
+            return chatOperations.sendGroupMessage(message, responder)
         default:
             return responder.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE)
     }
@@ -41,11 +41,13 @@ function accountRouter(responder: WebSocketResponder, message: WSAccountRequest)
     switch (message.reqType) {
         case "GET_CONTACTS":
             return accountsOperations.getContacts(responder)
+        case "GET_GROUPS":
+            return accountsOperations.getGroups(responder)
         case "PRIVATE_CHAT_HISTORY":
             return accountsOperations.getPrivateChatHistory(responder, message)
-        case "LOGOUT":
-            return
+        case "GROUP_CHAT_HISTORY":
+            return accountsOperations.getGroupChatHistory(responder, message)
         default:
-            return
+            return responder.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE)
     }
 }

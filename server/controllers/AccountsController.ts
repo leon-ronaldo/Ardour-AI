@@ -1,4 +1,5 @@
 import ChatPool, { IChatMessage, generateChatId } from "../models/ChatPool";
+import GroupChatPool, { IGroupChatMessage } from "../models/GroupChatPool";
 import UserModel from "../models/User";
 import WebSocketResponder from "../utils/WSResponder";
 import { ErrorCodes } from "../utils/responseCodes";
@@ -46,6 +47,7 @@ async function getPrivateChatHistory(responseHandler: WebSocketResponder, messag
         type: "Account",
         resType: "PRIVATE_CHAT_HISTORY",
         data: {
+            userId: recipientId,
             messages
         }
     }
@@ -53,7 +55,48 @@ async function getPrivateChatHistory(responseHandler: WebSocketResponder, messag
     responseHandler.sendData(data)
 }
 
+async function getGroups(responseHandler: WebSocketResponder) {
+    const userId = responseHandler.user!._id.toString();
+
+    const groups = await GroupChatPool.find({ participants: userId }).select("groupId name participants");
+
+    const data: WSAccountResponse = {
+        type: "Account",
+        resType: "GROUPS_LIST",
+        data: { groups }
+    };
+
+    responseHandler.sendData(data);
+}
+
+// Return group chat history
+async function getGroupChatHistory(responseHandler: WebSocketResponder, message: WSAccountRequest) {
+    const groupId = (message.data as { groupId: string }).groupId;
+
+    const groupChat = await GroupChatPool.findOne({ groupId });
+
+    if (!groupChat) {
+        responseHandler.sendMessageFromCode(ErrorCodes.GROUP_NOT_FOUND);
+        return;
+    }
+
+    const messages: IGroupChatMessage[] = groupChat.messages;
+
+    const data: WSAccountResponse = {
+        type: "Account",
+        resType: "GROUP_CHAT_HISTORY",
+        data: {
+            groupId,
+            messages
+        }
+    };
+
+    responseHandler.sendData(data);
+}
+
 export default {
     getContacts,
-    getPrivateChatHistory
+    getGroups,
+    getPrivateChatHistory,
+    getGroupChatHistory
 }
