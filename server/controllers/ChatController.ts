@@ -101,10 +101,10 @@ async function sendGroupMessage(message: WSChatRequest, responseHandler: WebSock
     };
 
     // Step 3: Broadcast message to all participants (except sender)
-    for (const memberId of groupPool.participants) {
-        if (memberId === senderId) continue;
+    for (const member of groupPool.participants) {
+        if (member.userId === senderId) continue;
 
-        const client = clientManager.getClient(memberId);
+        const client = clientManager.getClient(member.userId);
         if (client) {
             const response: WSChatResponse = {
                 type: "Chat",
