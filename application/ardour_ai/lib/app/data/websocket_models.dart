@@ -5,6 +5,7 @@ class WSModuleType {
   static const String Account = "Account";
   static const String Chat = "Chat";
   static const String Notification = "Notification";
+  static const String Authentication = "Authentication";
 }
 
 class AccountReqType {

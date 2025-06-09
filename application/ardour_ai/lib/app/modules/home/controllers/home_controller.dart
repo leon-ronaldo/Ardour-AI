@@ -1,37 +1,58 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, curly_braces_in_flow_control_structures
 
 import 'dart:convert';
 import 'package:ardour_ai/app/data/websocket_models.dart';
-import 'package:ardour_ai/app/utils/constants.dart';
+import 'package:ardour_ai/app/data/websocket_service.dart';
+import 'package:ardour_ai/app/routes/app_pages.dart';
 import 'package:ardour_ai/app/utils/widgets/snackbar.dart';
-import 'package:flutter/material.dart';
+import 'package:ardour_ai/main.dart';
 import 'package:get/get.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class HomeController extends GetxController {
-  late WebSocketChannel ws;
+  WebSocketService service = WebSocketService();
 
   RxList<String> contacts = <String>[].obs;
   RxList<String> groups = <String>[].obs;
 
+  RxBool isReady = false.obs;
+
   @override
   void onInit() {
     super.onInit();
-    if (connectServer()) getContacts();
+    connectServer().then((didConnect) {
+      if (didConnect) {
+        isReady.value = true;
+        getContacts();
+      }
+    });
   }
 
-  bool connectServer() {
-    try {
-      ws = WebSocketChannel.connect(Uri.parse(serverURL));
-      ws.stream.listen(listenData, onError: listenError, onDone: onDone);
-      return true;
-    } on Exception catch (e) {
-      noServerError();
+  Future<bool> connectServer() async {
+    String? token = await MainController.accessToken;
+    if (token == null) {
+      Get.offAllNamed(Routes.AUTHENTICATION);
       return false;
-    }
+    } else
+      try {
+        if (service.isConnected) await service.close();
+        service.connect(token: token);
+        service.addEventListeners(
+          listenData,
+          errorListener: listenError,
+          serverCloseListener: listenClose,
+        );
+        return true;
+      } on Exception catch (e) {
+        print("namma home la oru error pa connect panna pothu $e");
+        noServerError();
+        return false;
+      }
   }
 
-  void sendData(data) => ws.sink.add(jsonEncode(data));
+  void listenClose(int? code, String? reason) {
+    if (code == null) return;
+    if (code == 4003) Get.offAllNamed(Routes.AUTHENTICATION);
+  }
 
   void listenData(dynamic data) {
     print("data da: $data");
@@ -53,8 +74,6 @@ class HomeController extends GetxController {
 
   void listenError(dynamic error) {}
 
-  void onDone() {}
-
   void getContacts() async {
     final request = WSBaseRequest(
       type: WSModuleType.Account,
@@ -62,7 +81,7 @@ class HomeController extends GetxController {
       data: {},
     );
 
-    sendData(request);
+    service.send(request);
   }
 
   void moduleRouter(WSBaseResponse response) {

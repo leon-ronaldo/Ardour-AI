@@ -7,10 +7,9 @@ const ErrorCodes = {
     GROUP_NOT_FOUND: 4006,
 };
 
-
-
 const SuccessCodes = {
-    CONNECTION_SUCCESSFUL: 2000
+    CONNECTION_SUCCESSFUL: 2000,
+    AWAITING_CREDENTIALS: 2001,
 };
 
 export {

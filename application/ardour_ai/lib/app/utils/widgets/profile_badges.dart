@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:ardour_ai/app/utils/theme/colors.dart';
 import 'package:ardour_ai/app/utils/theme/shadows.dart';
 import 'package:flutter/material.dart';
@@ -68,48 +70,55 @@ class ProfileStatusBadge extends FTContainer {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           FTContainer(
-              child: Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.bottomRight,
-                children: [
-                  FTContainer()
-                    ..boxShadow = AppShadows.baseShadow
-                    ..height = height ?? 75
-                    ..width = height ?? 75
-                    ..bgImage = image
-                    ..borderRadius = FTBorderRadii.roundedFull,
+              child:
+                  FTContainer(
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          FTContainer()
+                            ..boxShadow = AppShadows.baseShadow
+                            ..height = height ?? 75
+                            ..width = height ?? 75
+                            ..bgImage = image
+                            ..borderRadius = FTBorderRadii.roundedFull,
 
-                  if (isUser)
-                    Positioned(
-                      bottom: -2.5,
-                      child:
-                          FTContainer(
+                          if (isUser)
+                            Positioned(
+                              bottom: -2.5,
                               child:
                                   FTContainer(
-                                      child: Icon(
-                                        Icons.add,
-                                        size: 12,
-                                        color: Colors.white,
-                                      ),
+                                      child:
+                                          FTContainer(
+                                              child: Icon(
+                                                Icons.add,
+                                                size: 12,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                            ..p = 2
+                                            ..borderRadius =
+                                                FTBorderRadii.roundedFull
+                                            ..bgColor = Color(0xffb45fb7),
                                     )
-                                    ..p = 2
                                     ..borderRadius = FTBorderRadii.roundedFull
-                                    ..bgColor = Color(0xffb45fb7),
-                            )
-                            ..borderRadius = FTBorderRadii.roundedFull
-                            ..p = 0.7
-                            ..bgColor = Colors.white,
-                    ),
-                ],
-              ),
+                                    ..p = 0.7
+                                    ..bgColor = Colors.white,
+                            ),
+                        ],
+                      ),
+                    )
+                    ..p = 1.5
+                    ..borderRadius = FTBorderRadii.roundedFull
+                    ..bgColor = Colors.white,
             )
             ..p = 2
-            ..border = FTBorder.all(
-              2.5,
-              isUser ? Colors.white : AppColors.statusBorder,
-            )
-            ..borderRadius = FTBorderRadii.roundedFull
-            ..mb = 5,
+            ..mb = 5
+            ..boxDecoration = BoxDecoration(
+              borderRadius: FTBorderRadii.roundedFull,
+              color: isUser ? Colors.white : null,
+              gradient: !isUser ? AppColors.baseGradient : null,
+            ),
 
           Text(
             isUser ? "Your Story" : name,
@@ -118,15 +127,6 @@ class ProfileStatusBadge extends FTContainer {
         ],
       ),
     );
-  }
-}
-
-class ProfileNotesBadge extends StatelessWidget {
-  const ProfileNotesBadge({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }
 
@@ -148,41 +148,70 @@ class ProfileBadgeWithNotes extends FTContainer {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Stack(
           clipBehavior: Clip.none,
-          alignment: Alignment.topCenter,
+          alignment: Alignment.bottomCenter,
           children: [
-            FTContainer()
-              ..boxShadow = AppShadows.baseShadow
-              ..height = height ?? 60
-              ..width = height ?? 60
-              ..mb = 5
-              ..bgImage = image
-              ..borderRadius = FTBorderRadii.roundedFull,
+            Positioned(
+              left: 15,
+              child:
+                  FTContainer()
+                    ..width = 8
+                    ..height = 8
+                    ..borderRadius = FTBorderRadii.roundedFull
+                    ..bgColor = const Color.fromARGB(255, 41, 41, 41),
+            ),
 
             Positioned(
-              top: -10,
+              left: 22,
+              bottom: -5,
               child:
-                  FTContainer(
-                      child: Text(
-                        note ?? name,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.lato(
-                          fontSize: 8,
-                          color: Colors.white,
-                        ),
-                      ),
-                    )
-                    ..bgColor = const Color.fromARGB(255, 41, 41, 41)
-                    ..borderRadius = FTBorderRadii.roundedLg
-                    ..p = 5
-                    ..width = 65,
+                  FTContainer()
+                    ..width = 5
+                    ..height = 5
+                    ..borderRadius = FTBorderRadii.roundedFull
+                    ..bgColor = const Color.fromARGB(255, 41, 41, 41),
             ),
+            FTContainer(
+                child: Text(
+                  note ?? "Your Note",
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.lato(fontSize: 9, color: Colors.white),
+                ),
+              )
+              ..bgColor = const Color.fromARGB(255, 41, 41, 41)
+              ..borderRadius = FTBorderRadii.roundedXl
+              ..p = 5
+              ..py = 7
+              ..width = 65
+              ..mb = 5,
           ],
         ),
+        FTContainer(
+          child: Column(
+            children: [
+              FTContainer()
+                ..boxShadow = AppShadows.baseShadow
+                ..height = height ?? 60
+                ..width = height ?? 60
+                ..mb = 5
+                ..bgImage = image
+                ..borderRadius = FTBorderRadii.roundedFull,
 
-        Text(name, style: GoogleFonts.lato(fontSize: 12)),
+              SizedBox(
+                width: 65,
+                child: Text(
+                  name,
+                  style: GoogleFonts.lato(fontSize: 12),
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        )..ml = 10,
       ],
     );
   }

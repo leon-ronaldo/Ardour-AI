@@ -138,9 +138,9 @@ getCustomSnackBar({
   ),
 );
 
-errorMessage() => getCustomSnackBar(
-  title: "Error",
-  message: "Some issue occured try again later!",
+errorMessage({String? message, String? title}) => getCustomSnackBar(
+  title: title ?? "Error",
+  message: message ?? "Some issue occured try again later!",
   status: CustomSnackBarStatus.danger,
 );
 serverError() => getCustomSnackBar(

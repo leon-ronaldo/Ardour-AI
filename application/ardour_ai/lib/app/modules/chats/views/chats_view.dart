@@ -31,29 +31,24 @@ class ChatsView extends GetView<ChatsController> {
                           itemBuilder:
                               (context, index) =>
                                   index == 0
-                                        ? (FTContainer(
-                                          child: ProfileBadgeWithNotes(
-                                            isUser: true,
-                                            name: "Your Note",
-                                            image:
-                                                sampleProfiles[index]
-                                                    .profilePic,
-                                          ),
-                                        )..ml = 15)
-                                        : FTContainer(
-                                          child: ProfileBadgeWithNotes(
-                                            name: sampleProfiles[index].name,
-                                            image:
-                                                sampleProfiles[index]
-                                                    .profilePic,
-                                            note: sampleProfiles[index].note,
-                                          ),
-                                        )
-                                    ..mr = 10,
+                                      ? (FTContainer(
+                                        child: ProfileBadgeWithNotes(
+                                          isUser: true,
+                                          name: "Add Note",
+                                          image:
+                                              sampleProfiles[index].profilePic,
+                                        ),
+                                      )..ml = 15)
+                                      : ProfileBadgeWithNotes(
+                                        name: sampleProfiles[index].name,
+                                        image: sampleProfiles[index].profilePic,
+                                        note: sampleProfiles[index].note,
+                                      ),
                         ),
                       )
                       ..width = MainController.size.width
-                      ..height = 120,
+                      ..alignment = Alignment.center
+                      ..height = 150,
 
                     FTContainer(
                         child: Row(
