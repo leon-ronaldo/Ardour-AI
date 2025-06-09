@@ -35,7 +35,7 @@ List<SampleProfile> sampleProfiles = [
   SampleProfile(
     profilePic: "assets/images/sample/lucia.png",
     name: "Lucia Caminos",
-    note: "Vice City’s next legend — fierce, fast, unforgettable 💄🔥",
+    note: "Vice City's next legend — fierce, fast, unforgettable 💄🔥",
   ),
   SampleProfile(
     profilePic: "assets/images/sample/ashlyn.png",

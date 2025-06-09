@@ -2,7 +2,6 @@ import 'package:ardour_ai/app/utils/theme/colors.dart';
 import 'package:ardour_ai/app/utils/widgets/profile_badges.dart';
 import 'package:ardour_ai/main.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:google_fonts/google_fonts.dart';
 

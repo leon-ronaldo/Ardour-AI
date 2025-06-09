@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "933102373369",
+    "project_id": "ardour-ai",
+    "storage_bucket": "ardour-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:933102373369:android:bb01215bfeaa1a26bc9528",
+        "android_client_info": {
+          "package_name": "com.wallOfHalo.ardour_ai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "933102373369-h90h6seefibe943mhjlp28b2tfi01uve.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wallOfHalo.ardour_ai",
+            "certificate_hash": "bc5704c6f9ddbf3b06c683ecf579e61010a1257f"
+          }
+        },
+        {
+          "client_id": "933102373369-hfmjk8tb1qe9t4kpkfpnbd8dbkt0qqv9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBF8L8t9GHrc8gdF8tgNwmZa5Z79zZdVqI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "933102373369-hfmjk8tb1qe9t4kpkfpnbd8dbkt0qqv9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

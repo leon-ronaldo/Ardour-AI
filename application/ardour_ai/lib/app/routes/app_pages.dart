@@ -1,9 +1,13 @@
 import 'package:get/get.dart';
 
+import '../modules/authentication/bindings/authentication_binding.dart';
+import '../modules/authentication/views/authentication_view.dart';
 import '../modules/chats/bindings/chats_binding.dart';
 import '../modules/chats/views/chats_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/personal_chat/bindings/personal_chat_binding.dart';
+import '../modules/personal_chat/views/personal_chat_view.dart';
 
 part 'app_routes.dart';
 
@@ -22,6 +26,16 @@ class AppPages {
       name: _Paths.CHATS,
       page: () => const ChatsView(),
       binding: ChatsBinding(),
+    ),
+    GetPage(
+      name: _Paths.PERSONAL_CHAT,
+      page: () => const PersonalChatView(),
+      binding: PersonalChatBinding(),
+    ),
+    GetPage(
+      name: _Paths.AUTHENTICATION,
+      page: () => const AuthenticationView(),
+      binding: AuthenticationBinding(),
     ),
   ];
 }
