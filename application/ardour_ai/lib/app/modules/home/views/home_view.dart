@@ -27,8 +27,10 @@ class HomeView extends GetView<HomeController> {
                   replacement: SizedBox(
                     width: MainController.size.width,
                     height: MainController.size.height,
-                    child: CircularProgressIndicator(
-                      color: AppColors.statusBorder,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.statusBorder,
+                      ),
                     ),
                   ),
                   child: SingleChildScrollView(
