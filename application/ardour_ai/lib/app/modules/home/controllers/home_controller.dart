@@ -19,34 +19,41 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    connectServer().then((didConnect) {
-      if (didConnect) {
-        isReady.value = true;
-        getContacts();
-      }
-    });
+    connectServer();
   }
 
   Future<bool> connectServer() async {
     String? token = await MainController.accessToken;
+    print("ready ena na ${isReady.value}");
     if (token == null) {
       Get.offAllNamed(Routes.AUTHENTICATION);
       return false;
-    } else
+    } else {
+      print("ulla came ma");
+      print("ipa ready ena na ${isReady.value}");
       try {
-        if (service.isConnected) await service.close();
+        if (service.isConnected) {
+          print("close panrom maa");
+          await service.close();
+        }
+        print("athuku munnadi ready ena na ${isReady.value}");
         service.connect(token: token);
+        print("broo ready ena na ${isReady.value}");
         service.addEventListeners(
           listenData,
           errorListener: listenError,
           serverCloseListener: listenClose,
         );
+        isReady.value = true;
+        print("adangotha ready ena na ${isReady.value}");
+        getContacts();
         return true;
       } on Exception catch (e) {
         print("namma home la oru error pa connect panna pothu $e");
         noServerError();
         return false;
       }
+    }
   }
 
   void listenClose(int? code, String? reason) {
