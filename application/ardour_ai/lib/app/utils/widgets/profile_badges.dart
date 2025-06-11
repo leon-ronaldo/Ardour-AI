@@ -1,7 +1,12 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:async';
+import 'dart:ui';
+
+import 'package:ardour_ai/app/data/sample_profiles.dart';
 import 'package:ardour_ai/app/utils/theme/colors.dart';
 import 'package:ardour_ai/app/utils/theme/shadows.dart';
+import 'package:ardour_ai/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -212,6 +217,275 @@ class ProfileBadgeWithNotes extends FTContainer {
             ],
           ),
         )..ml = 10,
+      ],
+    );
+  }
+}
+
+class ProfileFollowRequestCard extends StatefulWidget {
+  const ProfileFollowRequestCard({
+    super.key,
+    required this.name,
+    required this.image,
+    this.handle = "_jxhn_wxck*",
+    this.followers = "897",
+    this.following = "640",
+  });
+
+  final String name;
+  final String image;
+  final String handle;
+  final String following;
+  final String followers;
+
+  @override
+  State<ProfileFollowRequestCard> createState() =>
+      _ProfileFollowRequestCardState();
+}
+
+class _ProfileFollowRequestCardState extends State<ProfileFollowRequestCard>
+    with TickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _nameOpacity;
+  late Animation<double> _handleOpacity;
+  late Animation<double> _statsOpacity;
+  late Animation<double> _buttonOpacity;
+
+  late Animation<double> _namePosition;
+  late Animation<double> _handlePosition;
+  late Animation<double> _statsPosition;
+  late Animation<double> _buttonPosition;
+
+  Timer? returnTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+
+    _nameOpacity = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.3, curve: Curves.easeOut),
+      ),
+    );
+    _handleOpacity = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.2, 0.5, curve: Curves.easeOut),
+      ),
+    );
+    _statsOpacity = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.4, 0.7, curve: Curves.easeOut),
+      ),
+    );
+    _buttonOpacity = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.6, 1.0, curve: Curves.easeOut),
+      ),
+    );
+
+    _namePosition = Tween(begin: 20.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.3, curve: Curves.easeOut),
+      ),
+    );
+    _handlePosition = Tween(begin: 20.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.2, 0.5, curve: Curves.easeOut),
+      ),
+    );
+    _statsPosition = Tween(begin: 20.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.4, 0.7, curve: Curves.easeOut),
+      ),
+    );
+    _buttonPosition = Tween(begin: 20.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.6, 1.0, curve: Curves.easeOut),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget animatedItem({
+    required Animation<double> opacity,
+    required Animation<double> position,
+    required Widget child,
+  }) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder:
+          (context, _) => Opacity(
+            opacity: opacity.value,
+            child: Transform.translate(
+              offset: Offset(0, position.value),
+              child: child,
+            ),
+          ),
+    );
+  }
+
+  animate() {
+    if (_controller.isAnimating || returnTimer != null) {
+      return;
+    }
+    _controller.forward();
+    returnTimer = Timer(const Duration(seconds: 5), () {
+      _controller.reverse();
+      returnTimer = null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkResponse(
+      onTap: animate,
+      child: Stack(
+        children: [
+          // Background image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 160),
+              child: Image.asset(widget.image, fit: BoxFit.cover),
+            ),
+          ),
+
+          // Glassmorphism Layer
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder:
+                  (context, _) => Opacity(
+                    opacity: _nameOpacity.value, // Can be adjusted or separated
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(0.5),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+            ),
+          ),
+
+          // Foreground content
+          Positioned.fill(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                animatedItem(
+                  opacity: _nameOpacity,
+                  position: _namePosition,
+                  child: Text(
+                    widget.name,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                animatedItem(
+                  opacity: _handleOpacity,
+                  position: _handlePosition,
+                  child: Text(
+                    widget.handle,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white70,
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                animatedItem(
+                  opacity: _statsOpacity,
+                  position: _statsPosition,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ProfileStat(title: "Following", count: widget.following),
+                      ProfileStat(title: "Followers", count: widget.followers),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                animatedItem(
+                  opacity: _buttonOpacity,
+                  position: _buttonPosition,
+                  child:
+                      FTContainer(
+                          child: Text(
+                            "Follow",
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
+                          ),
+                        )
+                        ..p = 10
+                        ..width = MainController.size.width
+                        ..bgColor = AppColors.statusBorder,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ProfileStat extends StatelessWidget {
+  final String title;
+  final String count;
+
+  const ProfileStat({super.key, required this.title, required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(color: Colors.white70, fontSize: 10),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          count,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+        ),
       ],
     );
   }
