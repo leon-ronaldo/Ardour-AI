@@ -91,11 +91,15 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
         const validationResult = authenticateJWT(token)
 
         if (!validationResult.valid) {
+            console.log("validation error paa token invalid");
+
             responseHandler.closeClient(ErrorCodes.INVALID_TOKEN)
             return failedCase;
         }
 
         if (validationResult.expired) {
+            console.log("validation error paa token expired");
+
             responseHandler.closeClient(ErrorCodes.EXPIRED_TOKEN);
             return failedCase;
         }

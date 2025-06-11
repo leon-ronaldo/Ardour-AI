@@ -71,9 +71,13 @@ class ChatPageNavbar extends StatelessWidget {
             Row(
               children: [
                 SVGIcon("bell")..width = 20,
-                SVGIcon("send")
-                  ..width = 20
-                  ..ml = 20,
+                InkResponse(
+                  onTap: () => Get.toNamed(Routes.ADD_FRIENDS),
+                  child:
+                      SVGIcon("add-user")
+                        ..width = 20
+                        ..ml = 20,
+                ),
               ],
             ),
           ],
