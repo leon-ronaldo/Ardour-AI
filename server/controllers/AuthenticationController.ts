@@ -48,7 +48,8 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
                         lastName: req.data.userName!.split(" ").slice(1).join(" "),
                         email: req.data.email,
                         imageURL: req.data.profileImage,
-                        contacts: []
+                        contacts: [],
+                        friendRequests: [],
                     });
 
                     user = await newUser.save();

@@ -1,6 +1,6 @@
 import ChatPool, { IChatMessage, generateChatId } from "../models/ChatPool";
 import GroupChatPool, { IGroupChatMessage } from "../models/GroupChatPool";
-import UserModel from "../models/User";
+import UserModel, { IUser } from "../models/User";
 import WebSocketResponder from "../utils/WSResponder";
 import { ErrorCodes } from "../utils/responseCodes";
 import { WSAccountRequest, WSAccountResponse } from "../utils/types";
@@ -94,9 +94,73 @@ async function getGroupChatHistory(responseHandler: WebSocketResponder, message:
     responseHandler.sendData(data);
 }
 
+// Query accounts
+async function queryAccounts(responseHandler: WebSocketResponder, message: WSAccountRequest) {
+    const query = (message.data as { query: string }).query.toLowerCase()
+
+    const queriedAccounts = (await UserModel.find({}) as IUser[]).filter((account) =>
+        (account.username.toLowerCase().includes(query)
+            || account.firstName?.toLowerCase().includes(query)
+            || account.lastName?.toLowerCase().includes(query)
+            || account.email.toLowerCase().includes(query)) && account.email !== responseHandler.user!.email
+    );
+
+    const response: WSAccountResponse = {
+        type: "Account",
+        resType: "QUERY_ACCOUNTS_LIST",
+        data: {
+            matchedQueries: queriedAccounts.map((user: IUser) => ({ userName: user.username, userId: user._id.toString() }))
+        }
+    }
+
+    responseHandler.sendData(response)
+}
+
+// Update Profile
+
+async function updateAccount(responseHandler: WebSocketResponder, message: WSAccountRequest) {
+    const data = message.data as { firstName?: string, lastName?: string, profileImage?: string, userName?: string }
+
+    const user = await UserModel.findById(responseHandler.user?._id)
+
+    if (!user) {
+        responseHandler.sendMessageFromCode(ErrorCodes.USER_NOT_FOUND);
+        return
+    }
+
+    if (data.firstName !== undefined) user.firstName = data.firstName;
+    if (data.lastName !== undefined) user.lastName = data.lastName;
+    if (data.userName !== undefined) user.username = data.userName;
+    if (data.profileImage !== undefined) user.image = data.profileImage;
+
+    try {
+        await user.save();
+
+        const response: WSAccountResponse = {
+            type: "Account",
+            resType: "PROFILE_UPDATED",
+            data: {
+                updatedProfile: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    userName: user.username,
+                    profileImage: user.image,
+                }
+            }
+        }
+
+        responseHandler.sendMessage(response);
+    } catch (err) {
+        console.error("Error updating user:", err);
+        responseHandler.sendMessageFromCode(ErrorCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
 export default {
     getContacts,
     getGroups,
     getPrivateChatHistory,
-    getGroupChatHistory
+    getGroupChatHistory,
+    queryAccounts,
+    updateAccount
 }

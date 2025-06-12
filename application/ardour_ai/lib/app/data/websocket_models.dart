@@ -14,6 +14,7 @@ class AccountReqType {
   static const String GET_GROUPS = "GET_GROUPS";
   static const String PRIVATE_CHAT_HISTORY = "PRIVATE_CHAT_HISTORY";
   static const String GROUP_CHAT_HISTORY = "GROUP_CHAT_HISTORY";
+  static const String QUERY_ACCOUNTS = "QUERY_ACCOUNTS";
 }
 
 class AccountResType {
@@ -21,6 +22,7 @@ class AccountResType {
   static const String GROUPS_LIST = "GROUPS_LIST";
   static const String PRIVATE_CHAT_HISTORY = "PRIVATE_CHAT_HISTORY";
   static const String GROUP_CHAT_HISTORY = "GROUP_CHAT_HISTORY";
+  static const String QUERY_ACCOUNTS_LIST = "QUERY_ACCOUNTS_LIST";
 }
 
 class ChatReqType {

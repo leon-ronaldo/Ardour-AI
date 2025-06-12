@@ -43,10 +43,14 @@ function accountRouter(responder: WebSocketResponder, message: WSAccountRequest)
             return accountsOperations.getContacts(responder)
         case "GET_GROUPS":
             return accountsOperations.getGroups(responder)
+        case "QUERY_ACCOUNTS":
+            return accountsOperations.queryAccounts(responder, message)
         case "PRIVATE_CHAT_HISTORY":
             return accountsOperations.getPrivateChatHistory(responder, message)
         case "GROUP_CHAT_HISTORY":
             return accountsOperations.getGroupChatHistory(responder, message)
+        case "UPDATE_PROFILE":
+            return accountsOperations.updateAccount(responder, message)
         default:
             return responder.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE)
     }

@@ -38,7 +38,7 @@ class AuthenticationController extends GetxController {
     if (service.isConnected) await service.close();
     service.connect(url: authenticationURL);
 
-    service.addEventListeners((data) async {
+    service.addListener((data) async {
       print("annachi from chennai: $data");
 
       var parsedData = jsonDecode(data);
@@ -64,6 +64,33 @@ class AuthenticationController extends GetxController {
         serverError();
       }
     });
+
+    // service.addEventListeners((data) async {
+    //   print("annachi from chennai: $data");
+
+    //   var parsedData = jsonDecode(data);
+
+    //   if (parsedData['data'] != null) {
+    //     print(
+    //       "nigga for confirmation:\naccess: ${parsedData['data']['data']['accessToken']}\nrefresh: ${parsedData['data']['data']['refreshToken']}",
+    //     );
+    //     final storage = FlutterSecureStorage();
+    //     await storage.write(
+    //       key: "accessToken",
+    //       value: parsedData['data']['data']['accessToken'],
+    //     );
+    //     await storage.write(
+    //       key: "refreshToken",
+    //       value: parsedData['data']['data']['refreshToken'],
+    //     );
+
+    //     service.close();
+
+    //     Get.toNamed(Routes.HOME);
+    //   } else {
+    //     serverError();
+    //   }
+    // });
   }
 
   Future<void> signInWithGoogle() async {
