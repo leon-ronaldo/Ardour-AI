@@ -34,7 +34,7 @@ List<SampleProfile> sampleProfiles = [
     followers: "980",
   ),
   SampleProfile(
-    profilePic: "assets/images/sample/soorya.jpeg",
+    profilePic: "assets/images/sample/soorya.png",
     name: "Sooryodhaya",
     note: "Balancing love and logic — part romantic, part engineer 💘💻",
     handleName: "@soorya.mix",

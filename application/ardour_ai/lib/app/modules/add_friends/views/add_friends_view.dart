@@ -1,5 +1,6 @@
 import 'package:ardour_ai/app/data/sample_profiles.dart';
 import 'package:ardour_ai/app/utils/theme/colors.dart';
+import 'package:ardour_ai/app/utils/widgets/animated_widgets.dart';
 import 'package:ardour_ai/app/utils/widgets/navbars.dart';
 import 'package:ardour_ai/app/utils/widgets/profile_badges.dart';
 import 'package:ardour_ai/app/utils/widgets/search_bars.dart';
@@ -18,7 +19,7 @@ class AddFriendsView extends GetView<AddFriendsController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: AppColors.primaryBG,
+      backgroundColor: AppColors.primaryBG,
       body:
           FTContainer(
               child: SingleChildScrollView(
@@ -27,6 +28,8 @@ class AddFriendsView extends GetView<AddFriendsController> {
                   children: [
                     ChatPageNavbar(),
                     ModernSearchBar(
+                      textEditingController: controller.searchController,
+                      recommendations: controller.searchListRecommendations,
                       placeHolder: "Search people",
                       margin: EdgeInsets.fromLTRB(10, 5, 10, 15),
                     ),
@@ -43,12 +46,18 @@ class AddFriendsView extends GetView<AddFriendsController> {
                             NeverScrollableScrollPhysics(), // Disable grid scroll
                         itemBuilder: (context, index) {
                           final profile = sampleProfiles[index];
-                          return ProfileFollowRequestCard(
-                            followers: profile.followers,
-                            following: profile.following,
-                            handle: profile.handleName,
-                            name: profile.name,
-                            image: profile.profilePic,
+                          return AnimatedCrossFadeUp(
+                            delay:
+                                index != 0
+                                    ? Duration(milliseconds: 150 * index)
+                                    : null,
+                            child: ProfileFollowRequestCard(
+                              followers: profile.followers,
+                              following: profile.following,
+                              handle: profile.handleName,
+                              name: profile.name,
+                              image: profile.profilePic,
+                            ),
                           );
                         },
                       ),

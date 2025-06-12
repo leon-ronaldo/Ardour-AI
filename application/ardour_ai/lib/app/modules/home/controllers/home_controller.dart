@@ -2,15 +2,12 @@
 
 import 'dart:convert';
 import 'package:ardour_ai/app/data/websocket_models.dart';
-import 'package:ardour_ai/app/data/websocket_service.dart';
 import 'package:ardour_ai/app/routes/app_pages.dart';
 import 'package:ardour_ai/app/utils/widgets/snackbar.dart';
 import 'package:ardour_ai/main.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController {
-  WebSocketService service = WebSocketService();
-
   RxList<String> contacts = <String>[].obs;
   RxList<String> groups = <String>[].obs;
 
@@ -24,29 +21,27 @@ class HomeController extends GetxController {
 
   Future<bool> connectServer() async {
     String? token = await MainController.accessToken;
-    print("ready ena na ${isReady.value}");
+
     if (token == null) {
       Get.offAllNamed(Routes.AUTHENTICATION);
       return false;
     } else {
-      print("ulla came ma");
-      print("ipa ready ena na ${isReady.value}");
       try {
-        if (service.isConnected) {
+        if (MainController.service.isConnected) {
           print("close panrom maa");
-          await service.close();
+          await MainController.service.close();
         }
+
         print("athuku munnadi ready ena na ${isReady.value}");
-        service.connect(token: token);
-        print("broo ready ena na ${isReady.value}");
-        service.addEventListeners(
-          listenData,
-          errorListener: listenError,
+
+        await MainController.service.connect(
+          token: token,
           serverCloseListener: listenClose,
         );
+
+        MainController.service.addListener(listenData);
+
         isReady.value = true;
-        print("adangotha ready ena na ${isReady.value}");
-        getContacts();
         return true;
       } on Exception catch (e) {
         print("namma home la oru error pa connect panna pothu $e");
@@ -57,8 +52,14 @@ class HomeController extends GetxController {
   }
 
   void listenClose(int? code, String? reason) {
-    if (code == null) return;
-    if (code == 4003) Get.offAllNamed(Routes.AUTHENTICATION);
+    print("WebSocket closed: $code - $reason");
+
+    if (code == 4003) {
+      print("Token expired. Navigating to login...");
+      Future.delayed(Duration.zero, () {
+        Get.offAllNamed(Routes.AUTHENTICATION);
+      });
+    }
   }
 
   void listenData(dynamic data) {
@@ -79,7 +80,9 @@ class HomeController extends GetxController {
     }
   }
 
-  void listenError(dynamic error) {}
+  void listenError(dynamic error) {
+    print("error bro $error");
+  }
 
   void getContacts() async {
     final request = WSBaseRequest(
@@ -88,7 +91,7 @@ class HomeController extends GetxController {
       data: {},
     );
 
-    service.send(request);
+    MainController.service.send(request);
   }
 
   void moduleRouter(WSBaseResponse response) {

@@ -114,7 +114,7 @@ class ChatsView extends GetView<ChatsController> {
                     ChatCard(
                       name: "Sooryodhaya",
                       caption: "I'll send the updated prototype tonight.",
-                      image: "assets/images/sample/soorya.jpeg",
+                      image: "assets/images/sample/soorya.png",
                       unreadMessages: null,
                     ),
 
