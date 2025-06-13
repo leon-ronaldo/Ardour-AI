@@ -143,6 +143,11 @@ errorMessage({String? message, String? title}) => getCustomSnackBar(
   message: message ?? "Some issue occured try again later!",
   status: CustomSnackBarStatus.danger,
 );
+successMessage({String? message, String? title}) => getCustomSnackBar(
+  title: title ?? "Success",
+  message: message ?? "Action Completed Successfully",
+  status: CustomSnackBarStatus.success,
+);
 serverError() => getCustomSnackBar(
   title: "Server Error",
   message: "Server did not respond. Try again later!",

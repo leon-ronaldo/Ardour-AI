@@ -1,10 +1,12 @@
 import { IChatMessage } from "../models/ChatPool";
 import { IGroupChatMessage } from "../models/GroupChatPool";
+import { IPassUser } from "../models/User";
 
 export type WSModuleType = "Account" | "Chat" | "Notification" | "Presence" | "Authentication";
 export type AccountReqType = "UPDATE_PROFILE"
   | "GET_CONTACTS"
   | "GET_GROUPS"
+  | "RECOMMENDED_ACCOUNTS"
   | "PRIVATE_CHAT_HISTORY"
   | "GROUP_CHAT_HISTORY"
   | "QUERY_ACCOUNTS"
@@ -14,6 +16,9 @@ export type AccountResType = "PROFILE_UPDATED"
   | "CONTACT_LIST"
   | "GROUPS_LIST"
   | "QUERY_ACCOUNTS_LIST"
+  | "ACCOUNT_REQUEST_MADE"
+  | "ACCOUNT_REQUEST_ACCEPTED"
+  | "RECOMMENDED_ACCOUNTS_LIST"
   | "PRIVATE_CHAT_HISTORY"
   | "GROUP_CHAT_HISTORY";
 export type ChatReqType = "START_CHAT" | "SEND_MSG" | "FETCH_HISTORY" | "SEND_GROUP_MSG";
@@ -44,9 +49,10 @@ export interface WSBaseResponse<T extends WSModuleType, R extends ChatResType | 
 // ACCOUNT MODULE
 export type WSAccountRequest =
   WSBaseRequest<"Account", "UPDATE_PROFILE", { firstName?: string, lastName?: string, profileImage?: string, userName?: string }>
-  | WSBaseRequest<"Account", "MAKE_REQUEST", { userID: string }>
-  | WSBaseRequest<"Account", "ACCEPT_REQUEST", { userID: string }>
+  | WSBaseRequest<"Account", "MAKE_REQUEST", { userId: string }>
+  | WSBaseRequest<"Account", "ACCEPT_REQUEST", { userId: string }>
   | WSBaseRequest<"Account", "QUERY_ACCOUNTS", { query: string }>
+  | WSBaseRequest<"Account", "RECOMMENDED_ACCOUNTS", {}>
   | WSBaseRequest<"Account", "PRIVATE_CHAT_HISTORY", { userId: string }>
   | WSBaseRequest<"Account", "GROUP_CHAT_HISTORY", { groupId: string }>
   | WSBaseRequest<"Account", "GET_CONTACTS", {}>
@@ -70,8 +76,11 @@ export type WSClientRequest = WSAccountRequest | WSChatRequest | WSAuthentiacati
 export type WSAccountResponse =
   WSBaseResponse<"Account", "PROFILE_UPDATED", { updatedProfile: { firstName?: string, lastName?: string, profileImage?: string, userName?: string } }>
   | WSBaseResponse<"Account", "CONTACT_LIST", { contacts: any[] }>
+  | WSBaseResponse<"Account", "ACCOUNT_REQUEST_MADE", { success: boolean }>
+  | WSBaseResponse<"Account", "ACCOUNT_REQUEST_ACCEPTED", { success: boolean }>
   | WSBaseResponse<"Account", "GROUPS_LIST", { groups: any[] }>
-  | WSBaseResponse<"Account", "QUERY_ACCOUNTS_LIST", { matchedQueries: { userName: string, userId: string }[] }>
+  | WSBaseResponse<"Account", "QUERY_ACCOUNTS_LIST", { matchedQueries: IPassUser[] }>
+  | WSBaseResponse<"Account", "RECOMMENDED_ACCOUNTS_LIST", { recommendedUsers: IPassUser[] }>
   | WSBaseResponse<"Account", "PRIVATE_CHAT_HISTORY", { userId: string, messages: IChatMessage[] }>
   | WSBaseResponse<"Account", "GROUP_CHAT_HISTORY", { groupId: string; messages: IGroupChatMessage[] }>;
 

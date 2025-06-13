@@ -20,12 +20,12 @@ const rawUsers = [
   { username: "ezio_firenze", firstName: "Ezio", lastName: "Auditore", email: "ezio.auditore@example.com" },
 
   // original 6 users
-  { username: "john_doe", firstName: "John", lastName: "Doe", email: "john.doe@example.com", image: "https://images.unsplash.com/photo-1526116977494-90748acc0cad?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YWVzdGhldGljJTIwbWFufGVufDB8fDB8fHww" },
-  { username: "jane_smith", firstName: "Jane", lastName: "Smith", email: "jane.smith@example.com", image: "https://i.pinimg.com/236x/17/0f/6b/170f6bfe2a3b4ca88e33bb268a6a9e19.jpg" },
-  { username: "robert_lee", firstName: "Robert", lastName: "Lee", email: "robert.lee@example.com", image: "https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/139269947/original/3b8fed3799c7fc30ec0b4f83d07238c342debe20/help-you-boost-your-instagram-and-tinder-profile.jpg" },
-  { username: "alice_wang", firstName: "Alice", lastName: "Wang", email: "alice.wang@example.com", image: "https://i.pinimg.com/736x/6b/e1/aa/6be1aa1902ce295f70e6a1d91587bd51.jpg" },
-  { username: "michael_kim", firstName: "Michael", lastName: "Kim", email: "michael.kim@example.com", image: "https://images.unsplash.com/photo-1474031317822-f51f48735ddd?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGFlc3RoZXRpYyUyMGJveXxlbnwwfHwwfHx8MA%3D%3D" },
-  { username: "lisa_chen", firstName: "Lisa", lastName: "Chen", email: "lisa.chen@example.com", image: "https://i.pinimg.com/474x/14/48/3c/14483c3898da857249b9e901345284b8.jpg" },
+  { username: "john_doe", firstName: "John", lastName: "Doe", email: "john.doe@example.com", },
+  { username: "jane_smith", firstName: "Jane", lastName: "Smith", email: "jane.smith@example.com", },
+  { username: "robert_lee", firstName: "Robert", lastName: "Lee", email: "robert.lee@example.com", },
+  { username: "alice_wang", firstName: "Alice", lastName: "Wang", email: "alice.wang@example.com", },
+  { username: "michael_kim", firstName: "Michael", lastName: "Kim", email: "michael.kim@example.com", },
+  { username: "lisa_chen", firstName: "Lisa", lastName: "Chen", email: "lisa.chen@example.com", },
 ];
 
 const contactMap: Record<string, string[]> = {

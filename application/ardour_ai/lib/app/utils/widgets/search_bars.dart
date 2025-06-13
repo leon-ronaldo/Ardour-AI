@@ -1,3 +1,4 @@
+import 'package:ardour_ai/app/data/models.dart';
 import 'package:ardour_ai/app/utils/theme/colors.dart';
 import 'package:ardour_ai/app/utils/widgets/drawables.dart';
 import 'package:ardour_ai/main.dart';
@@ -11,7 +12,8 @@ class ModernSearchBar extends StatefulWidget {
   final TextEditingController textEditingController;
   final String placeHolder;
   final EdgeInsets? margin;
-  final RxList<Map<String, String>> recommendations;
+  final RxList<PassUser> searchResults;
+  final RxList<PassUser> searchRecommendations;
 
   ModernSearchBar({
     super.key,
@@ -19,7 +21,8 @@ class ModernSearchBar extends StatefulWidget {
     required this.textEditingController,
     this.margin,
     this.placeHolder = "What are you looking for?",
-    required this.recommendations,
+    required this.searchResults,
+    required this.searchRecommendations,
   });
 
   @override
@@ -63,7 +66,7 @@ class _ModernSearchBarState extends State<ModernSearchBar>
       begin: FTColors.gray200,
     ).animate(CurvedAnimation(parent: _barController, curve: Curves.easeInOut));
 
-    widget.recommendations.listen((updatedList) {
+    widget.searchResults.listen((updatedList) {
       if (focusNode.hasFocus && updatedList.isNotEmpty) {
         _suggestionController.forward();
       }
@@ -74,7 +77,8 @@ class _ModernSearchBarState extends State<ModernSearchBar>
 
       if (focusNode.hasFocus) {
         _barController.forward();
-        if (widget.recommendations.isNotEmpty) {
+        if (widget.searchResults.isNotEmpty ||
+            widget.searchRecommendations.isNotEmpty) {
           _suggestionController.forward();
         }
       } else {
@@ -84,9 +88,9 @@ class _ModernSearchBarState extends State<ModernSearchBar>
     });
   }
 
-  Widget searchItem(Map<String, String> item) {
+  Widget searchItem(PassUser item) {
     return InkWell(
-      onTap: () => widget.onItemTap?.call(item['userName']!),
+      onTap: () => widget.onItemTap?.call(item.userId),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Row(
@@ -96,7 +100,7 @@ class _ModernSearchBarState extends State<ModernSearchBar>
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                item['userName']!,
+                item.userName,
                 style: GoogleFonts.poppins(fontSize: 14),
               ),
             ),
@@ -124,7 +128,8 @@ class _ModernSearchBarState extends State<ModernSearchBar>
             sizeFactor: _suggestionController,
             axisAlignment: -1.0,
             child: Obx(() {
-              if (widget.recommendations.isEmpty)
+              if (widget.searchRecommendations.isEmpty &&
+                  widget.searchResults.isEmpty)
                 return const SizedBox.shrink();
 
               return FTContainer(
@@ -133,11 +138,17 @@ class _ModernSearchBarState extends State<ModernSearchBar>
                     children: [
                       const SizedBox(height: 10),
                       Text(
-                        "Related Searches",
+                        widget.searchResults.isEmpty
+                            ? "Recommended Accounts"
+                            : "Search Results",
                         style: GoogleFonts.poppins(fontSize: 16),
                       ),
                       const SizedBox(height: 10),
-                      ...widget.recommendations.map(searchItem).toList(),
+                      ...(widget.searchResults.isEmpty
+                              ? widget.searchRecommendations
+                              : widget.searchResults)
+                          .map(searchItem)
+                          .toList(),
                     ],
                   ),
                 )

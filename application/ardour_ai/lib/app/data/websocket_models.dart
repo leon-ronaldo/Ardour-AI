@@ -15,6 +15,9 @@ class AccountReqType {
   static const String PRIVATE_CHAT_HISTORY = "PRIVATE_CHAT_HISTORY";
   static const String GROUP_CHAT_HISTORY = "GROUP_CHAT_HISTORY";
   static const String QUERY_ACCOUNTS = "QUERY_ACCOUNTS";
+  static const String RECOMMENDED_ACCOUNTS = "RECOMMENDED_ACCOUNTS";
+  static const String MAKE_REQUEST = "MAKE_REQUEST";
+  static const String ACCEPT_REQUEST = "ACCEPT_REQUEST";
 }
 
 class AccountResType {
@@ -23,6 +26,9 @@ class AccountResType {
   static const String PRIVATE_CHAT_HISTORY = "PRIVATE_CHAT_HISTORY";
   static const String GROUP_CHAT_HISTORY = "GROUP_CHAT_HISTORY";
   static const String QUERY_ACCOUNTS_LIST = "QUERY_ACCOUNTS_LIST";
+  static const String RECOMMENDED_ACCOUNTS_LIST = "RECOMMENDED_ACCOUNTS_LIST";
+  static const String ACCOUNT_REQUEST_MADE = "ACCOUNT_REQUEST_MADE";
+  static const String ACCOUNT_REQUEST_ACCEPTED = "ACCOUNT_REQUEST_ACCEPTED";
 }
 
 class ChatReqType {
