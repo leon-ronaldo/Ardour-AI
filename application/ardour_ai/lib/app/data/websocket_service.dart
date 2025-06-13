@@ -6,8 +6,8 @@ import 'dart:convert';
 import 'package:ardour_ai/app/data/websocket_models.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-String serverURL(token) => "ws://10.0.2.2:8055/?token=$token";
-final String authenticationURL = "ws://10.0.2.2:8055/authenticate";
+String serverURL(token) => "ws://localhost:8055/?token=$token";
+final String authenticationURL = "ws://localhost:8055/authenticate";
 // const String token =
 //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODQxMzMwMmVkOTQxMmVjNWMwYWYzNjYiLCJlbWFpbCI6ImphbmUuc21pdGhAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDkyMjQ0OTQsImV4cCI6MTc0OTMxMDg5NH0.QFN9l8zyNM2cRwSHHKRA4BbWscXMJ_u0PhUK54z0AOw";
 // jane
