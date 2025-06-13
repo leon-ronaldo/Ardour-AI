@@ -51,7 +51,9 @@ class WebSocketResponder {
         maybeMessage ??
         Object.entries(ErrorCodes).find(([, val]) => val === code)?.[0] ??
         "Unknown error";
-      const reason = message.slice(0, 123); // Ensures reason is within byte limit
+      const reason = message.slice(0, 123);
+      console.log(`Closed with ${code} and ${reason}`);
+      // Ensures reason is within byte limit
       this.ws.close(code, reason);
     } else if (typeof codeOrMessage === "string") {
       const reason = codeOrMessage.slice(0, 123);

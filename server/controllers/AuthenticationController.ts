@@ -48,7 +48,8 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
                         lastName: req.data.userName!.split(" ").slice(1).join(" "),
                         email: req.data.email,
                         imageURL: req.data.profileImage,
-                        contacts: []
+                        contacts: [],
+                        friendRequests: [],
                     });
 
                     user = await newUser.save();
@@ -91,11 +92,15 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
         const validationResult = authenticateJWT(token)
 
         if (!validationResult.valid) {
+            console.log("validation error paa token invalid");
+
             responseHandler.closeClient(ErrorCodes.INVALID_TOKEN)
             return failedCase;
         }
 
         if (validationResult.expired) {
+            console.log("validation error paa token expired");
+
             responseHandler.closeClient(ErrorCodes.EXPIRED_TOKEN);
             return failedCase;
         }
@@ -109,13 +114,14 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
         }
 
         const user = (await User.findById(validationResult.decoded._id)) as IUser;
-        const uId = user._id.toString();
-        responseHandler.setUser(user)
 
         if (!user) {
             responseHandler.closeClient("Not an existing user please register");
             return failedCase;
         }
+
+        const uId = user._id.toString();
+        responseHandler.setUser(user)
 
         // handle clients
 

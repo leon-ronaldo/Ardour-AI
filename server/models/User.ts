@@ -7,18 +7,26 @@ export interface IUser extends Document {
   firstName?: string;
   lastName?: string;
   email: string;
-  imageURL?: string;
+  image?: string;
+  friendRequests: mongoose.Types.ObjectId[];
   contacts: mongoose.Types.ObjectId[];
   createdOn: Date;
+}
+
+export interface IPassUser {
+  userName: string, 
+  userId: string, 
+  profileImage?: string
 }
 
 const UserSchema = new mongoose.Schema<IUser>({
   username: { type: String, required: true, unique: true },
   firstName: { type: String },
   lastName: { type: String },
-  imageURL: { type: String },
+  image: { type: String },
   email: { type: String, required: true, unique: true },
   contacts: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   createdOn: { type: Date, default: Date.now }
 });
 

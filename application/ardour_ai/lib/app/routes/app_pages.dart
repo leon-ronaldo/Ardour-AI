@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/add_friends/bindings/add_friends_binding.dart';
+import '../modules/add_friends/views/add_friends_view.dart';
 import '../modules/authentication/bindings/authentication_binding.dart';
 import '../modules/authentication/views/authentication_view.dart';
 import '../modules/chats/bindings/chats_binding.dart';
@@ -36,6 +38,11 @@ class AppPages {
       name: _Paths.AUTHENTICATION,
       page: () => const AuthenticationView(),
       binding: AuthenticationBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADD_FRIENDS,
+      page: () => const AddFriendsView(),
+      binding: AddFriendsBinding(),
     ),
   ];
 }

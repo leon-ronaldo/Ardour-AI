@@ -1,9 +1,11 @@
 import ChatPool, { IChatMessage, generateChatId } from "../models/ChatPool";
 import GroupChatPool, { IGroupChatMessage } from "../models/GroupChatPool";
-import UserModel from "../models/User";
+import UserModel, { IPassUser, IUser } from "../models/User";
+import mongoose from "mongoose";
 import WebSocketResponder from "../utils/WSResponder";
 import { ErrorCodes } from "../utils/responseCodes";
 import { WSAccountRequest, WSAccountResponse } from "../utils/types";
+import { response } from "express";
 
 function getContacts(responseHandler: WebSocketResponder) {
     const data: WSAccountResponse = {
@@ -94,9 +96,182 @@ async function getGroupChatHistory(responseHandler: WebSocketResponder, message:
     responseHandler.sendData(data);
 }
 
+// Query accounts
+async function queryAccounts(responseHandler: WebSocketResponder, message: WSAccountRequest) {
+    const query = (message.data as { query: string }).query.toLowerCase()
+
+    const queriedAccounts = (await UserModel.find({}) as IUser[]).filter((account) =>
+        (account.username.toLowerCase().includes(query)
+            || account.firstName?.toLowerCase().includes(query)
+            || account.lastName?.toLowerCase().includes(query)
+            || account.email.toLowerCase().includes(query)) && account.email !== responseHandler.user!.email
+    );
+
+    const response: WSAccountResponse = {
+        type: "Account",
+        resType: "QUERY_ACCOUNTS_LIST",
+        data: {
+            matchedQueries: queriedAccounts.map((user: IUser) => ({ userName: user.username, userId: user._id.toString(), profileImage: user.image }))
+        }
+    }
+
+    responseHandler.sendData(response)
+}
+
+// Update Profile
+async function updateAccount(responseHandler: WebSocketResponder, message: WSAccountRequest) {
+    const data = message.data as { firstName?: string, lastName?: string, profileImage?: string, userName?: string }
+
+    const user = await UserModel.findById(responseHandler.user?._id)
+
+    if (!user) {
+        responseHandler.sendMessageFromCode(ErrorCodes.USER_NOT_FOUND);
+        return
+    }
+
+    if (data.firstName !== undefined) user.firstName = data.firstName;
+    if (data.lastName !== undefined) user.lastName = data.lastName;
+    if (data.userName !== undefined) user.username = data.userName;
+    if (data.profileImage !== undefined) user.image = data.profileImage;
+
+    try {
+        await user.save();
+
+        const response: WSAccountResponse = {
+            type: "Account",
+            resType: "PROFILE_UPDATED",
+            data: {
+                updatedProfile: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    userName: user.username,
+                    // profileImage: user.image,
+                }
+            }
+        }
+
+        responseHandler.sendData(response);
+    } catch (err) {
+        console.error("Error updating user:", err);
+        responseHandler.sendMessageFromCode(ErrorCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
+// Add accounts recommendation
+async function getAccountsRecommendation(responseHandler: WebSocketResponder, message: WSAccountRequest) {
+    // const query = (message.data as { query: string }).query.toLowerCase()
+
+    const currentUser = responseHandler.user!
+
+    let allAccounts = (await UserModel.find({}) as IUser[]).filter((user: IUser) => user._id !== currentUser._id);
+    const accountsThatAreFriendsToUser = allAccounts.filter((user: IUser) => user.contacts.includes(currentUser._id))
+    let recommended: IUser[] = []
+
+    if (accountsThatAreFriendsToUser.length === 0) {
+        allAccounts = allAccounts.sort((u1, u2) => (u1.contacts.length > u2.contacts.length ? 1 : 0));
+        recommended = allAccounts.slice(0, allAccounts.length < 10 ? allAccounts.length : 10)
+    }
+    else {
+        let recommendedIds: mongoose.Types.ObjectId[] = [];
+
+        for (var user of accountsThatAreFriendsToUser) {
+            console.log(`for each item: ${user.contacts.filter((accountId) => accountId !== currentUser._id && !currentUser.contacts.includes(accountId) && recommendedIds.includes(accountId))}`);
+            recommendedIds = [...recommendedIds, ...user.contacts.filter((accountId) => accountId !== currentUser._id && !currentUser.contacts.includes(accountId) && recommendedIds.includes(accountId))]
+        }
+
+        console.log("recommended ids:", recommendedIds);
+
+        recommended = allAccounts.filter((user) => recommendedIds.includes(user._id));
+
+        console.log("recommended users: ", recommended);
+    }
+
+
+    const response: WSAccountResponse = {
+        type: "Account",
+        resType: "RECOMMENDED_ACCOUNTS_LIST",
+        data: {
+            recommendedUsers: recommended.map((user: IUser) => ({ userName: user.username, userId: user._id.toString(), profileImage: user.image }))
+        }
+    }
+
+    responseHandler.sendData(response)
+}
+
+// Make friend request
+async function makeFriendRequest(responseHandler: WebSocketResponder, message: WSAccountRequest) {
+    let data = message.data as { userId: string }
+
+    let user = await UserModel.findById(data.userId);
+
+    if (!user) {
+        responseHandler.sendMessageFromCode(ErrorCodes.USER_NOT_FOUND)
+        return;
+    }
+
+    try {
+        if (!user.friendRequests.includes(responseHandler.user!._id)) {
+            user.friendRequests.push(responseHandler.user!._id);
+            await user.save();
+        }
+
+        const response: WSAccountResponse = {
+            type: "Account",
+            resType: "ACCOUNT_REQUEST_MADE",
+            data: {
+                success: true
+            }
+        }
+
+        responseHandler.sendData(response)
+    } catch (error) {
+        console.error("make request error", error);
+        responseHandler.sendMessageFromCode(ErrorCodes.INTERNAL_SERVER_ERROR)
+    }
+}
+
+// Accept friend request
+async function acceptFriendRequest(responseHandler: WebSocketResponder, message: WSAccountRequest) {
+    let data = message.data as { userId: string }
+
+    let user = await UserModel.findById(data.userId);
+
+    if (!user) {
+        responseHandler.sendMessageFromCode(ErrorCodes.USER_NOT_FOUND)
+        return;
+    }
+
+    if (!user.friendRequests.includes(responseHandler.user!._id)) {
+
+    }
+
+    try {
+        user.friendRequests = user.friendRequests.filter((accountId) => accountId.toString() !== data.userId);
+        await user.save();
+
+        const response: WSAccountResponse = {
+            type: "Account",
+            resType: "ACCOUNT_REQUEST_MADE",
+            data: {
+                success: true
+            }
+        }
+
+        responseHandler.sendData(response)
+    } catch (error) {
+        console.error("accept request error", error);
+        responseHandler.sendMessageFromCode(ErrorCodes.INTERNAL_SERVER_ERROR)
+    }
+}
+
 export default {
     getContacts,
     getGroups,
     getPrivateChatHistory,
-    getGroupChatHistory
+    getGroupChatHistory,
+    queryAccounts,
+    getAccountsRecommendation,
+    updateAccount,
+    makeFriendRequest,
+    acceptFriendRequest
 }

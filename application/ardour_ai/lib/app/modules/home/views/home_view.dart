@@ -27,8 +27,10 @@ class HomeView extends GetView<HomeController> {
                   replacement: SizedBox(
                     width: MainController.size.width,
                     height: MainController.size.height,
-                    child: CircularProgressIndicator(
-                      color: AppColors.statusBorder,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.statusBorder,
+                      ),
                     ),
                   ),
                   child: SingleChildScrollView(
@@ -135,7 +137,7 @@ class HomeView extends GetView<HomeController> {
 
                         ImagePostView(
                           name: "Sooryodhaya",
-                          profileImage: "assets/images/sample/soorya.jpeg",
+                          profileImage: "assets/images/sample/soorya.png",
                           postImage: "assets/images/sample/two-side.jpg",
                           caption:
                               "Two sides of the same soul — one holding her hand with warmth, the other chasing dreams in code. 💻❤️‍🔥 Balancing love and legacy like a true alter ego. #DualLife #EngineerInMaking #LoyalHeart",
