@@ -45,7 +45,9 @@ class AnimatedCrossFadeUpState extends State<AnimatedCrossFadeUp>
 
     if (!widget.preventAutoPlay) {
       if (widget.delay != null) {
-        Future.delayed(widget.delay!, () => _controller.forward());
+        Future.delayed(widget.delay!, () {
+          if (_controller != null) _controller.forward();
+        });
       } else {
         _controller.forward();
       }

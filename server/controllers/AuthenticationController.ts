@@ -114,13 +114,14 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
         }
 
         const user = (await User.findById(validationResult.decoded._id)) as IUser;
-        const uId = user._id.toString();
-        responseHandler.setUser(user)
 
         if (!user) {
             responseHandler.closeClient("Not an existing user please register");
             return failedCase;
         }
+
+        const uId = user._id.toString();
+        responseHandler.setUser(user)
 
         // handle clients
 

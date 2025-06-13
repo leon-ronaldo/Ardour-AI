@@ -13,6 +13,12 @@ export interface IUser extends Document {
   createdOn: Date;
 }
 
+export interface IPassUser {
+  userName: string, 
+  userId: string, 
+  profileImage?: string
+}
+
 const UserSchema = new mongoose.Schema<IUser>({
   username: { type: String, required: true, unique: true },
   firstName: { type: String },

@@ -1,4 +1,3 @@
-import 'package:ardour_ai/app/data/sample_profiles.dart';
 import 'package:ardour_ai/app/utils/theme/colors.dart';
 import 'package:ardour_ai/app/utils/widgets/animated_widgets.dart';
 import 'package:ardour_ai/app/utils/widgets/navbars.dart';
@@ -29,44 +28,69 @@ class AddFriendsView extends GetView<AddFriendsController> {
                     ChatPageNavbar(),
                     ModernSearchBar(
                       textEditingController: controller.searchController,
-                      recommendations: controller.searchListRecommendations,
+                      searchResults: controller.searchListRecommendations,
+                      searchRecommendations: controller.recommendedAccounts,
                       placeHolder: "Search people",
                       margin: EdgeInsets.fromLTRB(10, 5, 10, 15),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: MasonryGridView.count(
-                        padding: EdgeInsets.only(top: 10),
-                        crossAxisCount: 3,
-                        mainAxisSpacing: 5,
-                        crossAxisSpacing: 5,
-                        itemCount: sampleProfiles.length,
-                        shrinkWrap: true, // Let it take only required height
-                        physics:
-                            NeverScrollableScrollPhysics(), // Disable grid scroll
-                        itemBuilder: (context, index) {
-                          final profile = sampleProfiles[index];
-                          return AnimatedCrossFadeUp(
-                            delay:
-                                index != 0
-                                    ? Duration(milliseconds: 150 * index)
-                                    : null,
-                            child: ProfileFollowRequestCard(
-                              followers: profile.followers,
-                              following: profile.following,
-                              handle: profile.handleName,
-                              name: profile.name,
-                              image: profile.profilePic,
-                            ),
-                          );
-                        },
-                      ),
+                      child: Obx(() {
+                        final currentItems =
+                            controller.searchListRecommendations.isEmpty
+                                ? controller.recommendedAccounts
+                                : controller.searchListRecommendations;
+                        return Visibility(
+                          visible: currentItems.isNotEmpty,
+                          replacement:
+                              FTContainer(
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: AppColors.statusBorder,
+                                    ),
+                                  ),
+                                )
+                                ..mt = 50
+                                ..width = MainController.size.width,
+                          child: MasonryGridView.count(
+                            padding: EdgeInsets.only(top: 10),
+                            crossAxisCount: 3,
+                            mainAxisSpacing: 5,
+                            crossAxisSpacing: 5,
+                            itemCount: currentItems.length,
+                            shrinkWrap:
+                                true, // Let it take only required height
+                            physics:
+                                NeverScrollableScrollPhysics(), // Disable grid scroll
+                            itemBuilder: (context, index) {
+                              final profile = currentItems[index];
+                              return AnimatedCrossFadeUp(
+                                delay:
+                                    index != 0
+                                        ? Duration(milliseconds: 150 * index)
+                                        : null,
+                                child: ProfileFollowRequestCard(
+                                  // followers: profile.followers,
+                                  // following: profile.following,
+                                  // handle: profile.handleName,
+                                  userId: profile.userId,
+                                  name: profile.userName,
+                                  image:
+                                      profile.profileImage ??
+                                      'assets/images/sample/raul.jpg',
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      }),
                     ),
                     const SizedBox(height: 30), // bottom spacing
                   ],
                 ),
               ),
             )
+            ..alignment = Alignment.topCenter
             ..width = MainController.size.width
             ..height = MainController.size.height
             ..pt = MainController.padding.top + 10,

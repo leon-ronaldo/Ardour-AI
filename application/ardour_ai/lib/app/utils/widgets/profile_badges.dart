@@ -1,9 +1,11 @@
 // ignore_for_file: must_be_immutable
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:ardour_ai/app/data/sample_profiles.dart';
+import 'package:ardour_ai/app/data/websocket_models.dart';
 import 'package:ardour_ai/app/utils/theme/colors.dart';
 import 'package:ardour_ai/app/utils/theme/shadows.dart';
 import 'package:ardour_ai/main.dart';
@@ -227,6 +229,7 @@ class ProfileFollowRequestCard extends StatefulWidget {
     super.key,
     required this.name,
     required this.image,
+    required this.userId,
     this.handle = "_jxhn_wxck*",
     this.followers = "897",
     this.following = "640",
@@ -235,6 +238,7 @@ class ProfileFollowRequestCard extends StatefulWidget {
   final String name;
   final String image;
   final String handle;
+  final String userId;
   final String following;
   final String followers;
 
@@ -352,6 +356,20 @@ class _ProfileFollowRequestCardState extends State<ProfileFollowRequestCard>
     });
   }
 
+  void makeFriendRequest() {
+    try {
+      MainController.service.send(
+        WSBaseRequest(
+          type: WSModuleType.Account,
+          reqType: AccountReqType.MAKE_REQUEST,
+          data: {'userId': widget.userId},
+        ),
+      );
+    } catch (e) {
+      print("make request la error bro $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkResponse(
@@ -363,7 +381,19 @@ class _ProfileFollowRequestCardState extends State<ProfileFollowRequestCard>
             borderRadius: BorderRadius.circular(4),
             child: ConstrainedBox(
               constraints: const BoxConstraints(minHeight: 160),
-              child: Image.asset(widget.image, fit: BoxFit.cover),
+              child: Builder(
+                builder: (_) {
+                  if (widget.image.startsWith('data:image/')) {
+                    final base64Str = widget.image.split(',').last;
+                    final bytes = base64Decode(base64Str);
+                    return Image.memory(bytes, fit: BoxFit.cover);
+                  } else if (widget.image.startsWith('http')) {
+                    return Image.network(widget.image, fit: BoxFit.cover);
+                  } else {
+                    return Image.asset(widget.image, fit: BoxFit.cover);
+                  }
+                },
+              ),
             ),
           ),
 
@@ -440,19 +470,23 @@ class _ProfileFollowRequestCardState extends State<ProfileFollowRequestCard>
                 animatedItem(
                   opacity: _buttonOpacity,
                   position: _buttonPosition,
-                  child:
-                      FTContainer(
-                          child: Text(
-                            "Follow",
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 10,
+                  child: InkResponse(
+                    onTap: makeFriendRequest,
+                    child:
+                        FTContainer(
+                            child: Text(
+                              "Follow",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 10,
+                              ),
                             ),
-                          ),
-                        )
-                        ..p = 10
-                        ..width = MainController.size.width
-                        ..bgColor = AppColors.statusBorder,
+                          )
+                          ..p = 10
+                          ..m = 1
+                          ..width = MainController.size.width
+                          ..bgColor = AppColors.statusBorder,
+                  ),
                 ),
               ],
             ),

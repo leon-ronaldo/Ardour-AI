@@ -6,7 +6,7 @@ import path from "path";
 type SampleProfile = { profilePic: string; email: string };
 
 type WSBaseRequest<M extends string, A extends string, D> = {
-    module: M;
+    type: M;
     reqType: A;
     data: D;
 };
@@ -33,10 +33,6 @@ const profiles: SampleProfile[] = [
     { profilePic: "ac2-ezio.jpg", email: "ezio.auditore@example.com" },
 ];
 
-// Derive email from handle name
-const emailFromHandle = (handle: string) =>
-    handle.replace("@", "").replace(/\./g, "_") + "@example.com";
-
 // Read image as base64
 const getBase64Image = (fileName: string) => {
     const filePath = path.resolve(__dirname, "../tests/sampleData", fileName);
@@ -57,7 +53,7 @@ const sendWS = (ws: WebSocket, req: object) => ws.send(JSON.stringify(req));
             ws.on("open", () => {
                 const email = profile.email;
                 const authReq: WSBaseRequest<"Authentication", "AUTHENTICATE", { email: string }> = {
-                    module: "Authentication",
+                    type: "Authentication",
                     reqType: "AUTHENTICATE",
                     data: { email },
                 };
@@ -82,7 +78,7 @@ const sendWS = (ws: WebSocket, req: object) => ws.send(JSON.stringify(req));
                             "UPDATE_PROFILE",
                             { profileImage: string }
                         > = {
-                            module: "Account",
+                            type: "Account",
                             reqType: "UPDATE_PROFILE",
                             data: { profileImage },
                         };
