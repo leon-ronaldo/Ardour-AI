@@ -43,6 +43,18 @@ class ChatResType {
   static const String GROUP_CHAT_MESSAGE = "GROUP_CHAT_MESSAGE";
 }
 
+class NotificationReqType {
+  static const String GET_ACCOUNT_REQUESTS_NOTIFICATIONS =
+      "GET_ACCOUNT_REQUESTS_NOTIFICATIONS";
+  static const String CHECK_NOTIFICATIONS = "CHECK_NOTIFICATIONS";
+}
+
+class NotificationResType {
+  static const String ACCOUNT_REQUESTS_NOTIFICATIONS =
+      "ACCOUNT_REQUESTS_NOTIFICATIONS";
+  static const String DID_HAVE_NOTIFICATIONS = 'DID_HAVE_NOTIFICATIONS';
+}
+
 // Base Request Class
 class WSBaseRequest<T, R, D> {
   final T type;

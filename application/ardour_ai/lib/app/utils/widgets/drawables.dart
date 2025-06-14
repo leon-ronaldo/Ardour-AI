@@ -1,3 +1,5 @@
+import 'package:ardour_ai/app/utils/theme/colors.dart';
+import 'package:ardour_ai/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
@@ -26,5 +28,20 @@ class SVGIcon extends FTContainer {
         width: width,
       ),
     );
+  }
+}
+
+class PlaceHolderLoader extends StatelessWidget {
+  const PlaceHolderLoader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FTContainer(
+        child: Center(
+          child: CircularProgressIndicator(color: AppColors.statusBorder),
+        ),
+      )
+      ..mt = 50
+      ..width = MainController.size.width;
   }
 }
