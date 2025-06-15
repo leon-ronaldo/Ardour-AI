@@ -17,6 +17,7 @@ export interface AccountReqNotification {
 }
 
 export interface IPassAccountReqNotification {
+  userId: string,
   userName: string,
   profileImage?: string,
   timeStamp: number;
