@@ -25,11 +25,11 @@ const handleConnection = async (ws: WebSocket, req: http.IncomingMessage) => {
 
   const { success, responseHandler, uId } = await authenticateUser(ws, req)
 
-  if (!success) {
+  if (!success || !responseHandler) {
     return
   }
 
-  ws.on("message", (message: string) => AppRouter(ws, message, responseHandler!))
+  ws.on("message", (message: string) => AppRouter(message, responseHandler))
   ws.on("close", (code, reason) => {
     clientManager.removeClient(uId!);
     console.log(`User ${uId} left the pool\ncode: ${code}\nreason: ${reason}`)

@@ -1,5 +1,6 @@
 import 'package:ardour_ai/app/data/sample_profiles.dart';
 import 'package:ardour_ai/app/utils/theme/colors.dart';
+import 'package:ardour_ai/app/utils/widgets/drawables.dart';
 import 'package:ardour_ai/app/utils/widgets/navbars.dart';
 import 'package:ardour_ai/app/utils/widgets/post_views.dart';
 import 'package:ardour_ai/app/utils/widgets/profile_badges.dart';
@@ -24,15 +25,7 @@ class HomeView extends GetView<HomeController> {
               child: Obx(
                 () => Visibility(
                   visible: controller.isReady.value,
-                  replacement: SizedBox(
-                    width: MainController.size.width,
-                    height: MainController.size.height,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.statusBorder,
-                      ),
-                    ),
-                  ),
+                  replacement: PlaceHolderLoader(),
                   child: SingleChildScrollView(
                     child: Column(
                       children: [

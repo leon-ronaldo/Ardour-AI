@@ -1,11 +1,12 @@
 import WebSocket from "ws";
-import { WSChatRequest, WSClientRequest, ChatReqType, WSAccountRequest } from "../utils/types";
+import { WSChatRequest, WSClientRequest, ChatReqType, WSAccountRequest, WSNotificationRequest } from "../utils/types";
 import WebSocketResponder from "../utils/WSResponder";
 import chatOperations from "../controllers/ChatController";
 import accountsOperations from '../controllers/AccountsController';
+import notificationsOperations from '../controllers/NotificationsController';
 import { ErrorCodes } from "../utils/responseCodes";
 
-export default function AppRouter(ws: WebSocket, rawData: string, responseHandler: WebSocketResponder) {
+export default function AppRouter(rawData: string, responseHandler: WebSocketResponder) {
     let msg: WSClientRequest;
 
     try {
@@ -20,6 +21,8 @@ export default function AppRouter(ws: WebSocket, rawData: string, responseHandle
             return accountRouter(responseHandler, msg as WSAccountRequest);
         case "Chat":
             return chatRouter(responseHandler, msg as WSChatRequest);
+        case "Notification":
+            return notificationRouter(responseHandler, msg as WSNotificationRequest)
         default:
             return responseHandler.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE);
     }
@@ -57,6 +60,17 @@ function accountRouter(responder: WebSocketResponder, message: WSAccountRequest)
             return accountsOperations.getGroupChatHistory(responder, message)
         case "UPDATE_PROFILE":
             return accountsOperations.updateAccount(responder, message)
+        default:
+            return responder.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE)
+    }
+}
+
+function notificationRouter(responder: WebSocketResponder, message: WSNotificationRequest) {
+    switch (message.reqType) {
+        case "CHECK_NOTIFICATIONS":
+            return notificationsOperations.checkNotifications(responder)
+        case "GET_ACCOUNT_REQUESTS_NOTIFICATIONS":
+            return notificationsOperations.getAccountRequestNotifications(responder)
         default:
             return responder.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE)
     }

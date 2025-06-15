@@ -3,8 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
-
-import 'package:ardour_ai/app/data/sample_profiles.dart';
+import 'package:ardour_ai/app/data/models.dart';
 import 'package:ardour_ai/app/data/websocket_models.dart';
 import 'package:ardour_ai/app/utils/theme/colors.dart';
 import 'package:ardour_ai/app/utils/theme/shadows.dart';
@@ -133,6 +132,34 @@ class ProfileStatusBadge extends FTContainer {
           ),
         ],
       ),
+    );
+  }
+}
+
+class ProfileStat extends StatelessWidget {
+  final String title;
+  final String count;
+
+  const ProfileStat({super.key, required this.title, required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(color: Colors.white70, fontSize: 10),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          count,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -497,30 +524,108 @@ class _ProfileFollowRequestCardState extends State<ProfileFollowRequestCard>
   }
 }
 
-class ProfileStat extends StatelessWidget {
-  final String title;
-  final String count;
+class ProfileNotificationBadge extends StatelessWidget {
+  const ProfileNotificationBadge({super.key, required this.notification});
 
-  const ProfileStat({super.key, required this.title, required this.count});
+  final dynamic notification;
+
+  bool get isAccountReqNotification => notification is AccountReqNotification;
+  bool get isPostNotification => notification is PostNotification;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          title,
-          style: const TextStyle(color: Colors.white70, fontSize: 10),
+    return FTContainer(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ProfileBadge(
+              image:
+                  notification.profileImage ?? "assets/images/sample/raul.jpg",
+            ),
+
+            SizedBox(width: 10),
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: MainController.size.width * 0.65,
+                  child: RichText(
+                    text: TextSpan(
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: notification.userName,
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        TextSpan(
+                          text:
+                              isAccountReqNotification
+                                  ? " sent a friend request"
+                                  : isPostNotification
+                                  ? " has posted recently"
+                                  : " has new update",
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 5),
+
+                Text(
+                  notification.timeAgo,
+                  style: GoogleFonts.poppins(fontSize: 11),
+                ),
+
+                SizedBox(height: 5),
+
+                if (isAccountReqNotification)
+                  Row(
+                    children: [
+                      FTContainer(
+                          child:
+                              FTContainer(
+                                  child: Text(
+                                    "Accept",
+                                    style: GoogleFonts.poppins(fontSize: 10),
+                                  ),
+                                )
+                                ..px = 10
+                                ..py = 5
+                                ..width = 80
+                                ..bgColor = Colors.white
+                                ..borderRadius = BorderRadius.circular(6),
+                        )
+                        ..p = 1.5
+                        ..boxDecoration = BoxDecoration(
+                          gradient: AppColors.baseGradient,
+                          borderRadius: BorderRadius.circular(8),
+                        )
+                        ..mr = 10,
+
+                      FTContainer(
+                          child: Text(
+                            "Deny",
+                            style: GoogleFonts.poppins(fontSize: 10),
+                          ),
+                        )
+                        ..px = 10
+                        ..width = 80
+                        ..py = 6
+                        ..bgColor = Colors.white
+                        ..border = FTBorder.all(1.5, AppColors.danger)
+                        ..borderRadius = BorderRadius.circular(8),
+                    ],
+                  ),
+              ],
+            ),
+          ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          count,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-          ),
-        ),
-      ],
-    );
+      )
+      ..p = 10
+      ..width = MainController.size.width;
   }
 }
