@@ -1,5 +1,6 @@
 import 'package:ardour_ai/app/utils/theme/colors.dart';
 import 'package:ardour_ai/app/utils/widgets/animated_widgets.dart';
+import 'package:ardour_ai/app/utils/widgets/drawables.dart';
 import 'package:ardour_ai/app/utils/widgets/navbars.dart';
 import 'package:ardour_ai/app/utils/widgets/profile_badges.dart';
 import 'package:ardour_ai/app/utils/widgets/search_bars.dart';
@@ -42,16 +43,7 @@ class AddFriendsView extends GetView<AddFriendsController> {
                                 : controller.searchListRecommendations;
                         return Visibility(
                           visible: currentItems.isNotEmpty,
-                          replacement:
-                              FTContainer(
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      color: AppColors.statusBorder,
-                                    ),
-                                  ),
-                                )
-                                ..mt = 50
-                                ..width = MainController.size.width,
+                          replacement: PlaceHolderLoader(),
                           child: MasonryGridView.count(
                             padding: EdgeInsets.only(top: 10),
                             crossAxisCount: 3,

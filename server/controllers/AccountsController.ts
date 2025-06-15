@@ -212,6 +212,10 @@ async function makeFriendRequest(responseHandler: WebSocketResponder, message: W
     try {
         if (!user.friendRequests.includes(responseHandler.user!._id)) {
             user.friendRequests.push(responseHandler.user!._id);
+            user.notifications.accountReqNotifications.push({
+                userId: responseHandler.user!._id.toString(),
+                timeStamp: Date.now()
+            })
             await user.save();
         }
 

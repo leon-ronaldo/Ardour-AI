@@ -28,3 +28,74 @@ class PassUser {
     });
   }
 }
+
+class PostNotification {
+  final String postId;
+  final int timeStamp;
+
+  PostNotification({required this.postId, required this.timeStamp});
+
+  factory PostNotification.fromJson(Map<String, dynamic> json) {
+    return PostNotification(
+      postId: json['postId'],
+      timeStamp: json['timeStamp'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'postId': postId, 'timeStamp': timeStamp};
+  }
+
+  /// Returns human-readable "time ago" (e.g., '5 minutes ago')
+  String get timeAgo {
+    final time = DateTime.fromMillisecondsSinceEpoch(timeStamp);
+    final now = DateTime.now();
+    final diff = now.difference(time);
+
+    if (diff.inSeconds < 60) return '${diff.inSeconds}s ago';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return '${time.day}/${time.month}/${time.year}';
+  }
+}
+
+class AccountReqNotification {
+  final String userName;
+  final String? profileImage;
+  final int timeStamp;
+
+  AccountReqNotification({
+    required this.userName,
+    this.profileImage,
+    required this.timeStamp,
+  });
+
+  factory AccountReqNotification.fromJson(Map<String, dynamic> json) {
+    return AccountReqNotification(
+      userName: json['userName'],
+      profileImage: json['profileImage'],
+      timeStamp: json['timeStamp'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userName': userName,
+      'profileImage': profileImage,
+      'timeStamp': timeStamp,
+    };
+  }
+
+  String get timeAgo {
+    final time = DateTime.fromMillisecondsSinceEpoch(timeStamp);
+    final now = DateTime.now();
+    final diff = now.difference(time);
+
+    if (diff.inSeconds < 60) return '${diff.inSeconds}s ago';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return '${time.day}/${time.month}/${time.year}';
+  }
+}
