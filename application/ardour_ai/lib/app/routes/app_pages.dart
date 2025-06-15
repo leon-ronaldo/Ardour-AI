@@ -1,3 +1,5 @@
+import 'package:ardour_ai/app/modules/notifications_page/bindings/notifications_page_binding.dart';
+import 'package:ardour_ai/app/modules/notifications_page/views/notifications_page_view.dart';
 import 'package:get/get.dart';
 
 import '../modules/add_friends/bindings/add_friends_binding.dart';
@@ -43,6 +45,11 @@ class AppPages {
       name: _Paths.ADD_FRIENDS,
       page: () => const AddFriendsView(),
       binding: AddFriendsBinding(),
+    ),
+    GetPage(
+      name: _Paths.NOTIFICATIONS,
+      page: () => const NotificationsPageView(),
+      binding: NotificationsPageBinding(),
     ),
   ];
 }

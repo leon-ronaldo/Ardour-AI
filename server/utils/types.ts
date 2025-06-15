@@ -1,8 +1,15 @@
 import { IChatMessage } from "../models/ChatPool";
 import { IGroupChatMessage } from "../models/GroupChatPool";
-import { IPassUser } from "../models/User";
+import { AccountReqNotification, IPassAccountReqNotification, IPassUser } from "../models/User";
 
 export type WSModuleType = "Account" | "Chat" | "Notification" | "Presence" | "Authentication";
+
+export type NotificationReqType = "GET_ACCOUNT_REQUESTS_NOTIFICATIONS"
+  | "CHECK_NOTIFICATIONS"
+export type NotificationResType = "ACCOUNT_REQUESTS_NOTIFICATIONS"
+  | 'DID_HAVE_NOTIFICATIONS'
+
+// Account module types
 export type AccountReqType = "UPDATE_PROFILE"
   | "GET_CONTACTS"
   | "GET_GROUPS"
@@ -21,12 +28,27 @@ export type AccountResType = "PROFILE_UPDATED"
   | "RECOMMENDED_ACCOUNTS_LIST"
   | "PRIVATE_CHAT_HISTORY"
   | "GROUP_CHAT_HISTORY";
-export type ChatReqType = "START_CHAT" | "SEND_MSG" | "FETCH_HISTORY" | "SEND_GROUP_MSG";
-export type ChatResType = "PRIVATE_CHAT_MESSAGE" | "GROUP_CHAT_MESSAGE";
-export type AuthenticationReqType = "AUTHENTICATE"
-export type AuthenticationResType = "ACCESS_TOKEN" | "REFRESH_TOKEN" | "AUTH_TOKENS"
 
-export interface WSBaseRequest<T extends WSModuleType, R extends ChatReqType | AccountReqType | AuthenticationReqType, D = any> {
+
+// Chat module types
+export type ChatReqType = "START_CHAT"
+  | "SEND_MSG"
+  | "FETCH_HISTORY"
+  | "SEND_GROUP_MSG";
+export type ChatResType = "PRIVATE_CHAT_MESSAGE"
+  | "GROUP_CHAT_MESSAGE";
+
+
+// Authenticate module types
+export type AuthenticationReqType = "AUTHENTICATE"
+export type AuthenticationResType = "ACCESS_TOKEN"
+  | "REFRESH_TOKEN"
+  | "AUTH_TOKENS"
+
+export interface WSBaseRequest<T extends WSModuleType, R extends ChatReqType
+  | AccountReqType
+  | AuthenticationReqType
+  | NotificationReqType, D = any> {
   type: T;        // Domain/module
   reqType: R;     // Specific action/intent
   data: D;        // Payload for this request
@@ -36,7 +58,10 @@ export interface WSBaseRequest<T extends WSModuleType, R extends ChatReqType | A
   };
 }
 
-export interface WSBaseResponse<T extends WSModuleType, R extends ChatResType | AccountResType | AuthenticationResType, D = any> {
+export interface WSBaseResponse<T extends WSModuleType, R extends ChatResType
+  | AccountResType
+  | AuthenticationResType
+  | NotificationResType, D = any> {
   type: T;        // Domain/module
   resType: R;     // Specific response/intent
   data: D;        // Payload for this request
@@ -52,11 +77,16 @@ export type WSAccountRequest =
   | WSBaseRequest<"Account", "MAKE_REQUEST", { userId: string }>
   | WSBaseRequest<"Account", "ACCEPT_REQUEST", { userId: string }>
   | WSBaseRequest<"Account", "QUERY_ACCOUNTS", { query: string }>
-  | WSBaseRequest<"Account", "RECOMMENDED_ACCOUNTS", {}>
+  | WSBaseRequest<"Account", "RECOMMENDED_ACCOUNTS">
   | WSBaseRequest<"Account", "PRIVATE_CHAT_HISTORY", { userId: string }>
   | WSBaseRequest<"Account", "GROUP_CHAT_HISTORY", { groupId: string }>
-  | WSBaseRequest<"Account", "GET_CONTACTS", {}>
-  | WSBaseRequest<"Account", "GET_GROUPS", {}>;
+  | WSBaseRequest<"Account", "GET_CONTACTS">
+  | WSBaseRequest<"Account", "GET_GROUPS">;
+
+// NOTIFICATION MODULE
+export type WSNotificationRequest =
+  WSBaseRequest<"Notification", "GET_ACCOUNT_REQUESTS_NOTIFICATIONS">
+  | WSBaseRequest<"Notification", "CHECK_NOTIFICATIONS">
 
 // CHAT MODULE
 export type WSChatRequest =
@@ -70,7 +100,7 @@ export type WSAuthenticationRequest =
   WSBaseRequest<"Authentication", "AUTHENTICATE", { email: string, profileImage?: string, userName?: string }>
 
 // UNION TYPE FOR ALL REQUESTS
-export type WSClientRequest = WSAccountRequest | WSChatRequest | WSAuthentiacationResponse;
+export type WSClientRequest = WSAccountRequest | WSChatRequest | WSAuthenticationRequest | WSNotificationRequest;
 
 // ACCOUNT MODULE
 export type WSAccountResponse =
@@ -83,6 +113,13 @@ export type WSAccountResponse =
   | WSBaseResponse<"Account", "RECOMMENDED_ACCOUNTS_LIST", { recommendedUsers: IPassUser[] }>
   | WSBaseResponse<"Account", "PRIVATE_CHAT_HISTORY", { userId: string, messages: IChatMessage[] }>
   | WSBaseResponse<"Account", "GROUP_CHAT_HISTORY", { groupId: string; messages: IGroupChatMessage[] }>;
+
+
+// NOTIFICATION MODULE
+export type WSNotificationResponse =
+  WSBaseResponse<"Notification", "ACCOUNT_REQUESTS_NOTIFICATIONS", { accountRequestNotifications: IPassAccountReqNotification[] }>
+  | WSBaseResponse<"Notification", "DID_HAVE_NOTIFICATIONS", { didHaveNotification: boolean }>
+
 
 // CHAT MODULE
 export type WSChatResponse =
@@ -97,4 +134,4 @@ export type WSAuthentiacationResponse =
   | WSBaseResponse<"Authentication", "REFRESH_TOKEN", { refreshToken: string }>
 
 // UNION TYPE FOR ALL RESPONSES
-export type WSClientResponse = WSAccountResponse | WSChatResponse | WSAuthentiacationResponse;
+export type WSClientResponse = WSAccountResponse | WSChatResponse | WSAuthentiacationResponse | WSNotificationResponse;

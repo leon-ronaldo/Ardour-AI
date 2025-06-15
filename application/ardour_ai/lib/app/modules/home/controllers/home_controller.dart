@@ -12,6 +12,7 @@ class HomeController extends GetxController {
   RxList<String> groups = <String>[].obs;
 
   RxBool isReady = false.obs;
+  RxBool haveNotifications = false.obs;
 
   @override
   void onInit() {
@@ -40,6 +41,14 @@ class HomeController extends GetxController {
         );
 
         MainController.service.addListener(listenData);
+
+        MainController.service.send(
+          WSBaseRequest(
+            type: WSModuleType.Notification,
+            reqType: NotificationReqType.CHECK_NOTIFICATIONS,
+            data: {},
+          ),
+        );
 
         isReady.value = true;
         return true;
@@ -102,6 +111,9 @@ class HomeController extends GetxController {
       case WSModuleType.Chat:
         chatRouter(response);
         break;
+      case WSModuleType.Notification:
+        notificationRouter(response);
+        break;
       default:
         print("what bro?!");
         return;
@@ -136,6 +148,15 @@ class HomeController extends GetxController {
       default:
         print("Enaa paa!!");
         return;
+    }
+  }
+
+  void notificationRouter(WSBaseResponse response) {
+    switch (response.resType) {
+      case NotificationResType.DID_HAVE_NOTIFICATIONS:
+        haveNotifications.value = response.data['didHaveNotification'];
+        break;
+      default:
     }
   }
 }

@@ -8,6 +8,7 @@ abstract class Routes {
   static const PERSONAL_CHAT = _Paths.PERSONAL_CHAT;
   static const AUTHENTICATION = _Paths.AUTHENTICATION;
   static const ADD_FRIENDS = _Paths.ADD_FRIENDS;
+  static const NOTIFICATIONS = _Paths.NOTIFICATIONS;
 }
 
 abstract class _Paths {
@@ -17,4 +18,5 @@ abstract class _Paths {
   static const PERSONAL_CHAT = '/personal-chat';
   static const AUTHENTICATION = '/authentication';
   static const ADD_FRIENDS = '/add-friends';
+  static const NOTIFICATIONS = '/notifications';
 }
