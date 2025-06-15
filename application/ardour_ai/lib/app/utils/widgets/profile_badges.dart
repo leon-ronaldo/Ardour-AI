@@ -525,9 +525,10 @@ class _ProfileFollowRequestCardState extends State<ProfileFollowRequestCard>
 }
 
 class ProfileNotificationBadge extends StatelessWidget {
-  const ProfileNotificationBadge({super.key, required this.notification});
+  const ProfileNotificationBadge({super.key, required this.notification, this.onAccept});
 
   final dynamic notification;
+  final Function? onAccept;
 
   bool get isAccountReqNotification => notification is AccountReqNotification;
   bool get isPostNotification => notification is PostNotification;
@@ -585,26 +586,29 @@ class ProfileNotificationBadge extends StatelessWidget {
                 if (isAccountReqNotification)
                   Row(
                     children: [
-                      FTContainer(
-                          child:
-                              FTContainer(
-                                  child: Text(
-                                    "Accept",
-                                    style: GoogleFonts.poppins(fontSize: 10),
-                                  ),
-                                )
-                                ..px = 10
-                                ..py = 5
-                                ..width = 80
-                                ..bgColor = Colors.white
-                                ..borderRadius = BorderRadius.circular(6),
-                        )
-                        ..p = 1.5
-                        ..boxDecoration = BoxDecoration(
-                          gradient: AppColors.baseGradient,
-                          borderRadius: BorderRadius.circular(8),
-                        )
-                        ..mr = 10,
+                      InkResponse(
+                        onTap: () => onAccept?.call(),
+                        child: FTContainer(
+                            child:
+                                FTContainer(
+                                    child: Text(
+                                      "Accept",
+                                      style: GoogleFonts.poppins(fontSize: 10),
+                                    ),
+                                  )
+                                  ..px = 10
+                                  ..py = 5
+                                  ..width = 80
+                                  ..bgColor = Colors.white
+                                  ..borderRadius = BorderRadius.circular(6),
+                          )
+                          ..p = 1.5
+                          ..boxDecoration = BoxDecoration(
+                            gradient: AppColors.baseGradient,
+                            borderRadius: BorderRadius.circular(8),
+                          )
+                          ..mr = 10,
+                      ),
 
                       FTContainer(
                           child: Text(

@@ -63,16 +63,19 @@ class PostNotification {
 class AccountReqNotification {
   final String userName;
   final String? profileImage;
+  final String userId;
   final int timeStamp;
 
   AccountReqNotification({
     required this.userName,
+    required this.userId,
     this.profileImage,
     required this.timeStamp,
   });
 
   factory AccountReqNotification.fromJson(Map<String, dynamic> json) {
     return AccountReqNotification(
+      userId: json['userId'],
       userName: json['userName'],
       profileImage: json['profileImage'],
       timeStamp: json['timeStamp'],
@@ -81,6 +84,7 @@ class AccountReqNotification {
 
   Map<String, dynamic> toJson() {
     return {
+      'userId': userId,
       'userName': userName,
       'profileImage': profileImage,
       'timeStamp': timeStamp,
