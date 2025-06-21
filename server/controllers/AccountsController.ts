@@ -7,11 +7,20 @@ import { ErrorCodes } from "../utils/responseCodes";
 import { WSAccountRequest, WSAccountResponse } from "../utils/types";
 import { insertWithoutDuplicate, remove } from "../utils/tools";
 
-function getContacts(responseHandler: WebSocketResponder) {
+async function getContacts(responseHandler: WebSocketResponder) {
+
+    const contactIds = responseHandler.user!.contacts;
+
+    const contacts: IPassUser[] = (
+        await UserModel.find({ _id: { $in: contactIds } })
+    ).map(user => ({
+        userId: user._id.toString(), userName: user.username, profileImage: user.image
+    }))
+
     const data: WSAccountResponse = {
         type: "Account",
         resType: "CONTACT_LIST",
-        data: { contacts: responseHandler.user!.contacts }
+        data: { contacts }
     }
     responseHandler.sendData(data)
 }
