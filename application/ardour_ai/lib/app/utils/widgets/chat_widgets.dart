@@ -9,7 +9,7 @@ class ChatCard extends StatelessWidget {
   const ChatCard({
     super.key,
     required this.name,
-    required this.caption,
+    this.caption = "Messages are end-to-end encrypted",
     this.unreadMessages,
     required this.image,
   });

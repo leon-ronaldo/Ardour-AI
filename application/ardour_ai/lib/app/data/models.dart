@@ -10,6 +10,7 @@ class PassUser {
   PassUser({required this.userId, required this.userName, this.profileImage});
 
   factory PassUser.fromJSON(data) {
+    print("The data that is being decoded $data");
     if (data['userId'] == null || data['userName'] == null) {
       throw InvalidPassUserParameters();
     }
@@ -27,6 +28,12 @@ class PassUser {
       profileImage: profileImage,
     });
   }
+
+  Map<String, dynamic> toMap() => {
+    "userId": userId,
+    "userName": userName,
+    "profileImage": profileImage,
+  };
 }
 
 class PostNotification {
