@@ -105,9 +105,9 @@ export type WSClientRequest = WSAccountRequest | WSChatRequest | WSAuthenticatio
 // ACCOUNT MODULE
 export type WSAccountResponse =
   WSBaseResponse<"Account", "PROFILE_UPDATED", { updatedProfile: { firstName?: string, lastName?: string, profileImage?: string, userName?: string } }>
-  | WSBaseResponse<"Account", "CONTACT_LIST", { contacts: any[] }>
+  | WSBaseResponse<"Account", "CONTACT_LIST", { contacts: IPassUser[] }>
   | WSBaseResponse<"Account", "ACCOUNT_REQUEST_MADE", { success: boolean }>
-  | WSBaseResponse<"Account", "ACCOUNT_REQUEST_ACCEPTED", { success: boolean }>
+  | WSBaseResponse<"Account", "ACCOUNT_REQUEST_ACCEPTED", { success: boolean, userName: string }>
   | WSBaseResponse<"Account", "GROUPS_LIST", { groups: any[] }>
   | WSBaseResponse<"Account", "QUERY_ACCOUNTS_LIST", { matchedQueries: IPassUser[] }>
   | WSBaseResponse<"Account", "RECOMMENDED_ACCOUNTS_LIST", { recommendedUsers: IPassUser[] }>
