@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print, curly_braces_in_flow_control_structures
 
 import 'dart:convert';
+import 'package:ardour_ai/app/data/storage_service.dart';
 import 'package:ardour_ai/app/data/websocket_models.dart';
 import 'package:ardour_ai/app/routes/app_pages.dart';
 import 'package:ardour_ai/app/utils/widgets/snackbar.dart';
@@ -8,11 +9,10 @@ import 'package:ardour_ai/main.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController {
-  RxList<String> contacts = <String>[].obs;
-  RxList<String> groups = <String>[].obs;
-
   RxBool isReady = false.obs;
   RxBool haveNotifications = false.obs;
+
+  StorageServices storageServices = StorageServices();
 
   @override
   void onInit() {
@@ -29,11 +29,8 @@ class HomeController extends GetxController {
     } else {
       try {
         if (MainController.service.isConnected) {
-          print("close panrom maa");
           await MainController.service.close();
         }
-
-        print("athuku munnadi ready ena na ${isReady.value}");
 
         await MainController.service.connect(
           token: token,
@@ -42,18 +39,11 @@ class HomeController extends GetxController {
 
         MainController.service.addListener(listenData);
 
-        MainController.service.send(
-          WSBaseRequest(
-            type: WSModuleType.Notification,
-            reqType: NotificationReqType.CHECK_NOTIFICATIONS,
-            data: {},
-          ),
-        );
+        getInitialData();
 
         isReady.value = true;
         return true;
       } on Exception catch (e) {
-        print("namma home la oru error pa connect panna pothu $e");
         noServerError();
         return false;
       }
@@ -61,10 +51,7 @@ class HomeController extends GetxController {
   }
 
   void listenClose(int? code, String? reason) {
-    print("WebSocket closed: $code - $reason");
-
     if (code == 4003) {
-      print("Token expired. Navigating to login...");
       Future.delayed(Duration.zero, () {
         Get.offAllNamed(Routes.AUTHENTICATION);
       });
@@ -89,18 +76,28 @@ class HomeController extends GetxController {
     }
   }
 
-  void listenError(dynamic error) {
-    print("error bro $error");
-  }
-
-  void getContacts() async {
-    final request = WSBaseRequest(
-      type: WSModuleType.Account,
-      reqType: AccountReqType.GET_CONTACTS,
-      data: {},
+  void getInitialData() async {
+    // check notifications
+    MainController.service.send(
+      WSBaseRequest(
+        type: WSModuleType.Notification,
+        reqType: NotificationReqType.CHECK_NOTIFICATIONS,
+        data: {},
+      ),
     );
 
-    MainController.service.send(request);
+    // get contacts
+    if (DateTime.now()
+            .difference((await storageServices.lastDateOfFetchedContacts ?? DateTime(2004, 8, 29))) // just a fallback time 
+            .inDays >
+        4)
+      MainController.service.send(
+        WSBaseRequest(
+          type: WSModuleType.Account,
+          reqType: AccountReqType.GET_CONTACTS,
+          data: {},
+        ),
+      );
   }
 
   void moduleRouter(WSBaseResponse response) {
@@ -136,10 +133,9 @@ class HomeController extends GetxController {
     switch (response.resType) {
       case AccountResType.CONTACT_LIST:
         print("Received contacts: ${response.data}");
-        contacts.value = List<String>.from(response.data['contacts']);
+        storageServices.writeContacts(response.data['contacts']);
         break;
       case AccountResType.GROUPS_LIST:
-        groups.value = response.data['groups'];
         break;
       case AccountResType.PRIVATE_CHAT_HISTORY:
         break;

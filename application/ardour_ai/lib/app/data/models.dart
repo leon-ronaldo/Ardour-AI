@@ -10,6 +10,7 @@ class PassUser {
   PassUser({required this.userId, required this.userName, this.profileImage});
 
   factory PassUser.fromJSON(data) {
+    print("The data that is being decoded $data");
     if (data['userId'] == null || data['userName'] == null) {
       throw InvalidPassUserParameters();
     }
@@ -27,6 +28,12 @@ class PassUser {
       profileImage: profileImage,
     });
   }
+
+  Map<String, dynamic> toMap() => {
+    "userId": userId,
+    "userName": userName,
+    "profileImage": profileImage,
+  };
 }
 
 class PostNotification {
@@ -63,16 +70,19 @@ class PostNotification {
 class AccountReqNotification {
   final String userName;
   final String? profileImage;
+  final String userId;
   final int timeStamp;
 
   AccountReqNotification({
     required this.userName,
+    required this.userId,
     this.profileImage,
     required this.timeStamp,
   });
 
   factory AccountReqNotification.fromJson(Map<String, dynamic> json) {
     return AccountReqNotification(
+      userId: json['userId'],
       userName: json['userName'],
       profileImage: json['profileImage'],
       timeStamp: json['timeStamp'],
@@ -81,6 +91,7 @@ class AccountReqNotification {
 
   Map<String, dynamic> toJson() {
     return {
+      'userId': userId,
       'userName': userName,
       'profileImage': profileImage,
       'timeStamp': timeStamp,

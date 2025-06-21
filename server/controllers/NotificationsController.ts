@@ -41,6 +41,7 @@ async function getAccountRequestNotifications(responseHandler: WebSocketResponde
         const matchedUser = users.find(u => u._id.toString() === notification.userId.toString());
 
         return {
+            userId: matchedUser?._id.toString() ?? "Unknown Id",
             userName: matchedUser?.username ?? "Unknown User",
             profileImage: matchedUser?.image,
             timeStamp: notification.timeStamp

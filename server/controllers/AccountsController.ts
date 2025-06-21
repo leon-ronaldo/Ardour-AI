@@ -5,13 +5,22 @@ import mongoose from "mongoose";
 import WebSocketResponder from "../utils/WSResponder";
 import { ErrorCodes } from "../utils/responseCodes";
 import { WSAccountRequest, WSAccountResponse } from "../utils/types";
-import { response } from "express";
+import { insertWithoutDuplicate, remove } from "../utils/tools";
 
-function getContacts(responseHandler: WebSocketResponder) {
+async function getContacts(responseHandler: WebSocketResponder) {
+
+    const contactIds = responseHandler.user!.contacts;
+
+    const contacts: IPassUser[] = (
+        await UserModel.find({ _id: { $in: contactIds } })
+    ).map(user => ({
+        userId: user._id.toString(), userName: user.username, profileImage: user.image
+    }))
+
     const data: WSAccountResponse = {
         type: "Account",
         resType: "CONTACT_LIST",
-        data: { contacts: responseHandler.user!.contacts }
+        data: { contacts }
     }
     responseHandler.sendData(data)
 }
@@ -236,28 +245,47 @@ async function makeFriendRequest(responseHandler: WebSocketResponder, message: W
 
 // Accept friend request
 async function acceptFriendRequest(responseHandler: WebSocketResponder, message: WSAccountRequest) {
-    let data = message.data as { userId: string }
+    let data = message.data as { userId: string };
+    let theOneWhoAccepts = responseHandler.user!; // current user
 
-    let user = await UserModel.findById(data.userId);
+    let theOneWhoIsBeingAccepted = await UserModel.findById(data.userId);
 
-    if (!user) {
+    if (!theOneWhoIsBeingAccepted) {
         responseHandler.sendMessageFromCode(ErrorCodes.USER_NOT_FOUND)
         return;
     }
 
-    if (!user.friendRequests.includes(responseHandler.user!._id)) {
-
+    if (!theOneWhoAccepts.friendRequests.includes(theOneWhoIsBeingAccepted._id)) {
+        return;
     }
 
     try {
-        user.friendRequests = user.friendRequests.filter((accountId) => accountId.toString() !== data.userId);
-        await user.save();
+        // remove id from friendRequests list
+        theOneWhoAccepts.
+            friendRequests = theOneWhoAccepts.
+                friendRequests.filter(accountId => !accountId.equals(theOneWhoIsBeingAccepted!._id));
+
+        // remove notification
+        theOneWhoAccepts.
+            notifications.
+            accountReqNotifications = theOneWhoAccepts.
+                notifications.
+                accountReqNotifications.
+                filter((notification) => notification.userId !== theOneWhoIsBeingAccepted!._id.toString());
+
+        // add account id as friends list
+        insertWithoutDuplicate(theOneWhoAccepts.contacts, theOneWhoIsBeingAccepted._id);
+        insertWithoutDuplicate(theOneWhoIsBeingAccepted.contacts, theOneWhoAccepts._id);
+
+        await theOneWhoAccepts.save();
+        await theOneWhoIsBeingAccepted.save();
 
         const response: WSAccountResponse = {
             type: "Account",
-            resType: "ACCOUNT_REQUEST_MADE",
+            resType: "ACCOUNT_REQUEST_ACCEPTED",
             data: {
-                success: true
+                success: true,
+                userName: theOneWhoIsBeingAccepted!.username
             }
         }
 

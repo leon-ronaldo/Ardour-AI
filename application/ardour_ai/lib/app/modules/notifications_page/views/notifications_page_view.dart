@@ -45,6 +45,12 @@ class NotificationsPageView extends GetView<NotificationsPageController> {
                                         .map(
                                           (requestNotification) =>
                                               ProfileNotificationBadge(
+                                                onAccept:
+                                                    () => controller
+                                                        .acceptAccountRequest(
+                                                          requestNotification
+                                                              .userId,
+                                                        ),
                                                 notification:
                                                     requestNotification,
                                               ),

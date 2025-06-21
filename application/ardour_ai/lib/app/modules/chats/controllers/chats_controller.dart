@@ -1,12 +1,17 @@
+import 'package:ardour_ai/app/data/models.dart';
+import 'package:ardour_ai/app/data/storage_service.dart';
 import 'package:get/get.dart';
 
 class ChatsController extends GetxController {
-  //TODO: Implement ChatsController
+  StorageServices storageServices = StorageServices();
+  RxList<PassUser> contacts = <PassUser>[].obs;
 
-  final count = 0.obs;
+  RxBool isReady = false.obs;
+
   @override
   void onInit() {
     super.onInit();
+    fetchContacts();
   }
 
   @override
@@ -19,5 +24,8 @@ class ChatsController extends GetxController {
     super.onClose();
   }
 
-  void increment() => count.value++;
+  fetchContacts() async {
+    contacts.value = await storageServices.readContacts();
+    isReady.value = true;
+  }
 }
