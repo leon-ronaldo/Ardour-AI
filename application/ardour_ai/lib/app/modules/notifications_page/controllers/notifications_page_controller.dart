@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:ardour_ai/app/data/models.dart';
+import 'package:ardour_ai/app/data/storage_service.dart';
 import 'package:ardour_ai/app/data/websocket_models.dart';
 import 'package:ardour_ai/app/utils/widgets/snackbar.dart';
 import 'package:ardour_ai/main.dart';
@@ -77,6 +78,13 @@ class NotificationsPageController extends GetxController {
               title: "Request Accepted",
               message: "Accepted ${parsedData['data']['userName']}'s request",
             );
+            MainController.service.send(
+              WSBaseRequest(
+                type: WSModuleType.Account,
+                reqType: AccountReqType.GET_CONTACTS,
+                data: {},
+              ),
+            );
             break;
           default:
             print("some invalid response data ${parsedData}");
@@ -100,9 +108,11 @@ class NotificationsPageController extends GetxController {
 
   void acceptAccountRequest(String userId) {
     MainController.service.send(
-      WSBaseRequest(type: WSModuleType.Account, reqType: AccountReqType.ACCEPT_REQUEST, data: {
-        "userId": userId
-      }),
+      WSBaseRequest(
+        type: WSModuleType.Account,
+        reqType: AccountReqType.ACCEPT_REQUEST,
+        data: {"userId": userId},
+      ),
     );
   }
 }
