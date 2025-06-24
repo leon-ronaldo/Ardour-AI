@@ -36,11 +36,16 @@ class ChatReqType {
   static const String SEND_MSG = "SEND_MSG";
   static const String FETCH_HISTORY = "FETCH_HISTORY";
   static const String SEND_GROUP_MSG = "SEND_GROUP_MSG";
+  static const String IS_USER_ONLINE = "IS_USER_ONLINE";
+  static const String SET_IS_ONLINE = "SET_IS_ONLINE";
+  static const String SET_IS_TYPING = "SET_IS_TYPING";
 }
 
 class ChatResType {
   static const String PRIVATE_CHAT_MESSAGE = "PRIVATE_CHAT_MESSAGE";
   static const String GROUP_CHAT_MESSAGE = "GROUP_CHAT_MESSAGE";
+  static const String USER_ONLINE_STATUS = "USER_ONLINE_STATUS";
+  static const String USER_TYPING_STATUS = "USER_TYPING_STATUS";
 }
 
 class NotificationReqType {

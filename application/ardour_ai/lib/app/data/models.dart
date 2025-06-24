@@ -110,3 +110,73 @@ class AccountReqNotification {
     return '${time.day}/${time.month}/${time.year}';
   }
 }
+
+class ChatMessage {
+  final String from;
+  final String to;
+  final String message;
+  final int timestamp;
+
+  bool _isLiveMessage;
+
+  ChatMessage({
+    required this.from,
+    required this.to,
+    required this.message,
+    required this.timestamp,
+    bool isLiveMessage = false,
+  }) : _isLiveMessage = isLiveMessage;
+
+  // Getter for isLiveMessage
+  bool get isLiveMessage => _isLiveMessage;
+
+  // Setter for isLiveMessage
+  set isLiveMessage(bool value) => _isLiveMessage = value;
+
+  /// Factory to create from JSON
+  factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    return ChatMessage(
+      from: json['from'],
+      to: json['to'],
+      message: json['message'],
+      timestamp: json['timestamp'],
+    );
+  }
+
+  /// Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {'from': from, 'to': to, 'message': message, 'timestamp': timestamp};
+  }
+
+  /// Optional: Format timestamp to human-readable time
+  String get formattedTime {
+    final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    return "${date.hour}:${date.minute.toString().padLeft(2, '0')}";
+  }
+}
+
+class PersonalChat {
+  final String contactId;
+  final List<ChatMessage> messages;
+
+  PersonalChat({required this.contactId, required this.messages});
+
+  /// Convert from JSON
+  factory PersonalChat.fromJson(Map<String, dynamic> json) {
+    return PersonalChat(
+      contactId: json['contactId'],
+      messages:
+          (json['messages'] as List)
+              .map((e) => ChatMessage.fromJson(e))
+              .toList(),
+    );
+  }
+
+  /// Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'contactId': contactId,
+      'messages': messages.map((e) => e.toJson()).toList(),
+    };
+  }
+}

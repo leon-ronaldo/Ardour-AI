@@ -28,10 +28,6 @@ class HomeController extends GetxController {
       return false;
     } else {
       try {
-        if (MainController.service.isConnected) {
-          await MainController.service.close();
-        }
-
         await MainController.service.connect(
           token: token,
           serverCloseListener: listenClose,
@@ -88,7 +84,10 @@ class HomeController extends GetxController {
 
     // get contacts
     if (DateTime.now()
-            .difference((await storageServices.lastDateOfFetchedContacts ?? DateTime(2004, 8, 29))) // just a fallback time 
+            .difference(
+              (await storageServices.lastDateOfFetchedContacts ??
+                  DateTime(2004, 8, 29)),
+            ) // just a fallback time
             .inDays >
         4)
       MainController.service.send(
