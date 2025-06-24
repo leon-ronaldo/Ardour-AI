@@ -45,10 +45,15 @@ class MainController {
 
   // utils
   static final storage = FlutterSecureStorage();
+
   static Future<String?> get accessToken async =>
       await storage.read(key: "accessToken");
   static Future<String?> get refreshToken async =>
       await storage.read(key: "refreshToken");
+
+  static Future<String?> get userId async => await storage.read(key: "userId");
+  static Future<String?> get profileImage async =>
+      await storage.read(key: "profileImage");
 
   // ws service
   static final WebSocketService service = WebSocketService();

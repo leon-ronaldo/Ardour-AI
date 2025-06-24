@@ -33,14 +33,19 @@ export type AccountResType = "PROFILE_UPDATED"
 // Chat module types
 export type ChatReqType = "START_CHAT"
   | "SEND_MSG"
-  | "FETCH_HISTORY"
-  | "SEND_GROUP_MSG";
+  | "SEND_GROUP_MSG"
+  | "SET_IS_ONLINE"
+  | "IS_USER_ONLINE"
+  | "SET_IS_TYPING";
 export type ChatResType = "PRIVATE_CHAT_MESSAGE"
+  | "USER_ONLINE_STATUS"
+  | "USER_TYPING_STATUS"
   | "GROUP_CHAT_MESSAGE";
 
 
 // Authenticate module types
 export type AuthenticationReqType = "AUTHENTICATE"
+  | "AUTHENTICATE_WITH_PASSWORD"
 export type AuthenticationResType = "ACCESS_TOKEN"
   | "REFRESH_TOKEN"
   | "AUTH_TOKENS"
@@ -92,12 +97,15 @@ export type WSNotificationRequest =
 export type WSChatRequest =
   WSBaseRequest<"Chat", "START_CHAT", { to: string }>
   | WSBaseRequest<"Chat", "SEND_MSG", IChatMessage>
-  | WSBaseRequest<"Chat", "SEND_GROUP_MSG", IGroupChatMessage>
-  | WSBaseRequest<"Chat", "FETCH_HISTORY", { withUser: string; limit?: number }>;
+  | WSBaseRequest<"Chat", "SET_IS_ONLINE", { recieverId: string, isOnline: boolean }>
+  | WSBaseRequest<"Chat", "IS_USER_ONLINE", { userId: string }>
+  | WSBaseRequest<"Chat", "SET_IS_TYPING", { isTyping: boolean, recieverId: string }>
+  | WSBaseRequest<"Chat", "SEND_GROUP_MSG", IGroupChatMessage>;
 
 // AUTHENTICATION MODULE
 export type WSAuthenticationRequest =
   WSBaseRequest<"Authentication", "AUTHENTICATE", { email: string, profileImage?: string, userName?: string }>
+  | WSBaseRequest<"Authentication", "AUTHENTICATE_WITH_PASSWORD", { email: string, password: string }>
 
 // UNION TYPE FOR ALL REQUESTS
 export type WSClientRequest = WSAccountRequest | WSChatRequest | WSAuthenticationRequest | WSNotificationRequest;
@@ -124,14 +132,16 @@ export type WSNotificationResponse =
 // CHAT MODULE
 export type WSChatResponse =
   WSBaseResponse<"Chat", "PRIVATE_CHAT_MESSAGE", IChatMessage>
-  | WSBaseResponse<"Chat", "GROUP_CHAT_MESSAGE", IGroupChatMessage>;
+  | WSBaseResponse<"Chat", "GROUP_CHAT_MESSAGE", IGroupChatMessage>
+  | WSBaseResponse<"Chat", "USER_ONLINE_STATUS", { userId: string, isOnline: boolean }>
+  | WSBaseResponse<"Chat", "USER_TYPING_STATUS", { userId: string, isTyping: boolean }>;
 
 
 // AUTHENTICATION MODULE
 export type WSAuthentiacationResponse =
-  WSBaseResponse<"Authentication", "AUTH_TOKENS", { accessToken: string, refreshToken: string }>
-  | WSBaseResponse<"Authentication", "ACCESS_TOKEN", { accessToken: string }>
-  | WSBaseResponse<"Authentication", "REFRESH_TOKEN", { refreshToken: string }>
+  WSBaseResponse<"Authentication", "AUTH_TOKENS", { accessToken: string, refreshToken: string, userId: string, profileImage?: string }>
+  | WSBaseResponse<"Authentication", "ACCESS_TOKEN", { accessToken: string, userId: string, profileImage?: string }>
+  | WSBaseResponse<"Authentication", "REFRESH_TOKEN", { refreshToken: string, userId: string, profileImage?: string }>
 
 // UNION TYPE FOR ALL RESPONSES
 export type WSClientResponse = WSAccountResponse | WSChatResponse | WSAuthentiacationResponse | WSNotificationResponse;

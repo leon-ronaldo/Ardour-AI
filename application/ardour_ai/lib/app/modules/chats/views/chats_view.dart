@@ -1,4 +1,5 @@
 import 'package:ardour_ai/app/data/sample_profiles.dart';
+import 'package:ardour_ai/app/routes/app_pages.dart';
 import 'package:ardour_ai/app/utils/theme/colors.dart';
 import 'package:ardour_ai/app/utils/widgets/chat_widgets.dart';
 import 'package:ardour_ai/app/utils/widgets/drawables.dart';
@@ -115,12 +116,20 @@ class ChatsView extends GetView<ChatsController> {
                             children:
                                 controller.contacts
                                     .map(
-                                      (contact) => ChatCard(
-                                        name: contact.userName,
-                                        image:
-                                            contact.profileImage ??
-                                            "assets/images/sample/raul.jpg",
-                                        unreadMessages: null,
+                                      (contact) => InkResponse(
+                                        onTap: () {
+                                          Get.toNamed(
+                                            Routes.PERSONAL_CHAT,
+                                            arguments: {'contact': contact},
+                                          );
+                                        },
+                                        child: ChatCard(
+                                          name: contact.userName,
+                                          image:
+                                              contact.profileImage ??
+                                              "assets/images/sample/raul.jpg",
+                                          unreadMessages: null,
+                                        ),
                                       ),
                                     )
                                     .toList(),

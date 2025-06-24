@@ -32,7 +32,7 @@ async function sendMessage(message: WSChatRequest, responseHandler: WebSocketRes
         from: responseHandler.user!._id.toString(),
         to: recipientId,
         message: data.message,
-        timestamp: Date.now()
+        timestamp: data.timestamp
     };
 
     // Step 4: Check if recipient is online
@@ -41,12 +41,7 @@ async function sendMessage(message: WSChatRequest, responseHandler: WebSocketRes
         const incomingMessage: WSChatResponse = {
             type: "Chat",
             resType: "PRIVATE_CHAT_MESSAGE",
-            data: {
-                from: responseHandler.user!._id.toString(),
-                message: data.message,
-                to: recipientId,
-                timestamp: Date.now()
-            }
+            data: newMessage
         };
 
         console.log("brooo", liveClient);
@@ -121,7 +116,82 @@ async function sendGroupMessage(message: WSChatRequest, responseHandler: WebSock
     await groupPool.save();
 }
 
+async function getUserIsOnline(message: WSChatRequest, responseHandler: WebSocketResponder) {
+    const parsedData = message.data as { userId: string };
+    const liveClient = clientManager.getClient(parsedData.userId);
+
+    let response: WSChatResponse;
+
+    if (liveClient) {
+        response = {
+            type: "Chat",
+            resType: "USER_ONLINE_STATUS",
+            data: {
+                userId: parsedData.userId,
+                isOnline: true
+            }
+        };
+    } else {
+        response = {
+            type: "Chat",
+            resType: "USER_ONLINE_STATUS",
+            data: {
+                userId: parsedData.userId,
+                isOnline: false
+            }
+        };
+    }
+
+    console.log(responseHandler.user!._id.toString(), "asked for whether", parsedData.userId, "alive and", response);
+
+
+    responseHandler.sendData(response)
+}
+
+async function setIsOnline(message: WSChatRequest, responseHandler: WebSocketResponder) {
+    const { recieverId,
+        isOnline } = message.data as { recieverId: string, isOnline: boolean };
+    const liveClient = clientManager.getClient(recieverId);
+
+    let response: WSChatResponse = {
+        type: "Chat",
+        resType: "USER_ONLINE_STATUS",
+        data: {
+            userId: responseHandler.user!._id.toString(),
+            isOnline
+        }
+    };
+
+    if (liveClient) {
+        (new WebSocketResponder(liveClient)).sendData(response)
+    }
+}
+
+async function setIsTyping(message: WSChatRequest, responseHandler: WebSocketResponder) {
+    const { recieverId,
+        isTyping } = message.data as { recieverId: string, isTyping: boolean };
+    const liveClient = clientManager.getClient(recieverId);
+
+    let response: WSChatResponse = {
+        type: "Chat",
+        resType: "USER_TYPING_STATUS",
+        data: {
+            userId: responseHandler.user!._id.toString(),
+            isTyping
+        }
+    };
+
+    if (liveClient) {
+        (new WebSocketResponder(liveClient)).sendData(response)
+    }
+}
+
+
+
 export default {
     sendMessage,
-    sendGroupMessage
+    sendGroupMessage,
+    getUserIsOnline,
+    setIsTyping,
+    setIsOnline
 }

@@ -33,7 +33,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PERSONAL_CHAT,
-      page: () => const PersonalChatView(),
+      page: () => PersonalChatView(),
       binding: PersonalChatBinding(),
     ),
     GetPage(

@@ -4,6 +4,7 @@ import 'package:ardour_ai/app/data/websocket_models.dart';
 import 'package:ardour_ai/app/data/websocket_service.dart';
 import 'package:ardour_ai/app/routes/app_pages.dart';
 import 'package:ardour_ai/app/utils/widgets/snackbar.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -17,6 +18,9 @@ class AuthenticationController extends GetxController {
     'https://www.googleapis.com/auth/userinfo.profile',
     'https://www.googleapis.com/auth/userinfo.email',
   ];
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   void onInit() {
@@ -35,7 +39,6 @@ class AuthenticationController extends GetxController {
   }
 
   Future<void> initializeService() async {
-    if (service.isConnected) await service.close();
     service.connect(url: authenticationURL);
 
     service.addListener((data) async {
@@ -49,6 +52,10 @@ class AuthenticationController extends GetxController {
         );
         final storage = FlutterSecureStorage();
         await storage.write(
+          key: "userId",
+          value: parsedData['data']['data']['userId'],
+        );
+        await storage.write(
           key: "accessToken",
           value: parsedData['data']['data']['accessToken'],
         );
@@ -57,40 +64,16 @@ class AuthenticationController extends GetxController {
           value: parsedData['data']['data']['refreshToken'],
         );
 
-        service.close();
+        await storage.write(
+          key: "profileImage",
+          value: parsedData['data']['data']['profileImage'],
+        );
 
         Get.toNamed(Routes.HOME);
       } else {
         serverError();
       }
     });
-
-    // service.addEventListeners((data) async {
-    //   print("annachi from chennai: $data");
-
-    //   var parsedData = jsonDecode(data);
-
-    //   if (parsedData['data'] != null) {
-    //     print(
-    //       "nigga for confirmation:\naccess: ${parsedData['data']['data']['accessToken']}\nrefresh: ${parsedData['data']['data']['refreshToken']}",
-    //     );
-    //     final storage = FlutterSecureStorage();
-    //     await storage.write(
-    //       key: "accessToken",
-    //       value: parsedData['data']['data']['accessToken'],
-    //     );
-    //     await storage.write(
-    //       key: "refreshToken",
-    //       value: parsedData['data']['data']['refreshToken'],
-    //     );
-
-    //     service.close();
-
-    //     Get.toNamed(Routes.HOME);
-    //   } else {
-    //     serverError();
-    //   }
-    // });
   }
 
   Future<void> signInWithGoogle() async {
@@ -119,6 +102,7 @@ class AuthenticationController extends GetxController {
         type: WSModuleType.Authentication,
         reqType: "",
         data: {"email": email, "userName": name, "profileImage": photo},
+        // data: {"email": "jane.smith@example.com", "userName": "jane_smith", "profileImage": photo},
       );
 
       service.send(request);
@@ -129,5 +113,28 @@ class AuthenticationController extends GetxController {
         message: "Some error occured while signing in",
       );
     }
+  }
+
+  void signInWithEmail() {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty || !email.isEmail) {
+      errorMessage(message: "Enter a valid email", title: "Invalid inputs");
+      return;
+    }
+
+    if (password.isEmpty || password.length < 8) {
+      errorMessage(message: "Enter a valid password", title: "Invalid inputs");
+      return;
+    }
+
+    service.send(
+      WSBaseRequest(
+        type: WSModuleType.Authentication,
+        reqType: "AUTHENTICATE_WITH_PASSWORD",
+        data: {"email": email, "password": password},
+      ),
+    );
   }
 }
