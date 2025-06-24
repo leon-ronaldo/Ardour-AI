@@ -9,6 +9,7 @@ class StorageServices {
 
   static const String CONTACTS = "CONTACTS";
   static const String LAST_DATE_OF_FETCHED_CONTACTS = "LAST_FETCHED_CONTACTS";
+  static const String PERSONAL_CHATS = "PERSONAL_CHATS";
 
   List<PassUser> contacts = [];
 
@@ -50,5 +51,44 @@ class StorageServices {
             .toList();
 
     return contacts;
+  }
+
+  Future<void> writePersonalChat(PersonalChat newChat) async {
+    final jsonString = await _storage.read(key: PERSONAL_CHATS);
+
+    List<PersonalChat> allChats = [];
+
+    if (jsonString != null && jsonString.isNotEmpty) {
+      final decoded = jsonDecode(jsonString);
+      allChats =
+          (decoded as List).map((e) => PersonalChat.fromJson(e)).toList();
+    }
+
+    final existingIndex = allChats.indexWhere(
+      (chat) => chat.contactId == newChat.contactId,
+    );
+
+    if (existingIndex != -1) {
+      allChats[existingIndex] = newChat;
+    } else {
+      allChats.add(newChat);
+    }
+
+    final updatedJson = jsonEncode(allChats.map((e) => e.toJson()).toList());
+    await _storage.write(key: PERSONAL_CHATS, value: updatedJson);
+  }
+
+  Future<PersonalChat?> readPersonalChat(String contactId) async {
+    final jsonString = await _storage.read(key: PERSONAL_CHATS);
+
+    if (jsonString == null || jsonString.isEmpty) return null;
+
+    final decoded = jsonDecode(jsonString);
+    final allChats =
+        (decoded as List).map((e) => PersonalChat.fromJson(e)).toList();
+
+    return allChats.firstWhere(
+      (chat) => chat.contactId == contactId,
+    );
   }
 }

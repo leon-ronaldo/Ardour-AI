@@ -10,6 +10,7 @@ import 'package:ardour_ai/app/utils/theme/shadows.dart';
 import 'package:ardour_ai/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProfileBadge extends FTContainer {
@@ -61,12 +62,28 @@ class ProfileStatusBadge extends FTContainer {
     this.name = "Your Story",
     required this.image,
     this.isUser = false,
-  });
+  }) {
+    if (isUser) {
+      isLoading.value = true;
+      _loadImage();
+    } else {
+      loadedImage.value = image;
+    }
+  }
 
   final String image;
   final String name;
   final int statusCount;
   final bool isUser;
+
+  final RxBool isLoading = false.obs;
+  final RxString loadedImage = "".obs;
+
+  void _loadImage() async {
+    final img = await MainController.profileImage;
+    loadedImage.value = img ?? "assets/images/sample/raul.jpg";
+    isLoading.value = false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,13 +99,14 @@ class ProfileStatusBadge extends FTContainer {
                         clipBehavior: Clip.none,
                         alignment: Alignment.bottomRight,
                         children: [
-                          FTContainer()
-                            ..boxShadow = AppShadows.baseShadow
-                            ..height = height ?? 75
-                            ..width = height ?? 75
-                            ..bgImage = image
-                            ..borderRadius = FTBorderRadii.roundedFull,
-
+                          Obx(() {
+                            return FTContainer()
+                              ..boxShadow = AppShadows.baseShadow
+                              ..height = height ?? 75
+                              ..width = height ?? 75
+                              ..bgImage = loadedImage.value
+                              ..borderRadius = FTBorderRadii.roundedFull;
+                          }),
                           if (isUser)
                             Positioned(
                               bottom: -2.5,
@@ -105,7 +123,7 @@ class ProfileStatusBadge extends FTContainer {
                                             ..p = 2
                                             ..borderRadius =
                                                 FTBorderRadii.roundedFull
-                                            ..bgColor = Color(0xffb45fb7),
+                                            ..bgColor = const Color(0xffb45fb7),
                                     )
                                     ..borderRadius = FTBorderRadii.roundedFull
                                     ..p = 0.7
@@ -125,7 +143,6 @@ class ProfileStatusBadge extends FTContainer {
               color: isUser ? Colors.white : null,
               gradient: !isUser ? AppColors.baseGradient : null,
             ),
-
           Text(
             isUser ? "Your Story" : name,
             style: GoogleFonts.lato(fontSize: 12),
@@ -525,7 +542,11 @@ class _ProfileFollowRequestCardState extends State<ProfileFollowRequestCard>
 }
 
 class ProfileNotificationBadge extends StatelessWidget {
-  const ProfileNotificationBadge({super.key, required this.notification, this.onAccept});
+  const ProfileNotificationBadge({
+    super.key,
+    required this.notification,
+    this.onAccept,
+  });
 
   final dynamic notification;
   final Function? onAccept;
@@ -588,26 +609,29 @@ class ProfileNotificationBadge extends StatelessWidget {
                     children: [
                       InkResponse(
                         onTap: () => onAccept?.call(),
-                        child: FTContainer(
-                            child:
-                                FTContainer(
-                                    child: Text(
-                                      "Accept",
-                                      style: GoogleFonts.poppins(fontSize: 10),
-                                    ),
-                                  )
-                                  ..px = 10
-                                  ..py = 5
-                                  ..width = 80
-                                  ..bgColor = Colors.white
-                                  ..borderRadius = BorderRadius.circular(6),
-                          )
-                          ..p = 1.5
-                          ..boxDecoration = BoxDecoration(
-                            gradient: AppColors.baseGradient,
-                            borderRadius: BorderRadius.circular(8),
-                          )
-                          ..mr = 10,
+                        child:
+                            FTContainer(
+                                child:
+                                    FTContainer(
+                                        child: Text(
+                                          "Accept",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      )
+                                      ..px = 10
+                                      ..py = 5
+                                      ..width = 80
+                                      ..bgColor = Colors.white
+                                      ..borderRadius = BorderRadius.circular(6),
+                              )
+                              ..p = 1.5
+                              ..boxDecoration = BoxDecoration(
+                                gradient: AppColors.baseGradient,
+                                borderRadius: BorderRadius.circular(8),
+                              )
+                              ..mr = 10,
                       ),
 
                       FTContainer(

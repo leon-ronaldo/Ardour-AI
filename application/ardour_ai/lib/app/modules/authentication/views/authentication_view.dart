@@ -73,6 +73,7 @@ class AuthenticationView extends GetView<AuthenticationController> {
                       ),
                       SizedBox(height: 20),
                       TextField(
+                        controller: controller.emailController,
                         style: TextStyle(fontSize: 13), // Input text size
                         decoration: InputDecoration(
                           labelText: 'Email address',
@@ -93,8 +94,34 @@ class AuthenticationView extends GetView<AuthenticationController> {
                           contentPadding: EdgeInsets.symmetric(horizontal: 15),
                         ),
                       ),
+                      SizedBox(height: 15),
+                      TextField(
+                        controller: controller.passwordController,
+                        style: TextStyle(fontSize: 13), // Input text size
+                        obscureText: true,
+                        obscuringCharacter: "*",
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          labelStyle: TextStyle(
+                            fontSize: 13,
+                          ), // Label text size
+                          hintText: 'Enter your password',
+                          hintStyle: TextStyle(fontSize: 13),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: AppColors.statusBorder,
+                              width: 1.5,
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                        ),
+                      ),
                       SizedBox(height: 20),
                       InkResponse(
+                        onTap: controller.signInWithEmail,
                         child:
                             FTContainer(
                                 child: Text(

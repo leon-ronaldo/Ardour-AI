@@ -7,71 +7,77 @@ import notificationsOperations from '../controllers/NotificationsController';
 import { ErrorCodes } from "../utils/responseCodes";
 
 export default function AppRouter(rawData: string, responseHandler: WebSocketResponder) {
-    let msg: WSClientRequest;
+  let msg: WSClientRequest;
 
-    try {
-        msg = JSON.parse(rawData);
-        console.log(msg);
-    } catch {
-        return responseHandler.invalidParametersError();
-    }
+  try {
+    msg = JSON.parse(rawData);
+    console.log(msg);
+  } catch {
+    return responseHandler.invalidParametersError();
+  }
 
-    switch (msg.type) {
-        case "Account":
-            return accountRouter(responseHandler, msg as WSAccountRequest);
-        case "Chat":
-            return chatRouter(responseHandler, msg as WSChatRequest);
-        case "Notification":
-            return notificationRouter(responseHandler, msg as WSNotificationRequest)
-        default:
-            return responseHandler.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE);
-    }
+  switch (msg.type) {
+    case "Account":
+      return accountRouter(responseHandler, msg as WSAccountRequest);
+    case "Chat":
+      return chatRouter(responseHandler, msg as WSChatRequest);
+    case "Notification":
+      return notificationRouter(responseHandler, msg as WSNotificationRequest)
+    default:
+      return responseHandler.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE);
+  }
 
 }
 
 function chatRouter(responder: WebSocketResponder, message: WSChatRequest) {
-    switch (message.reqType) {
-        case "SEND_MSG":
-            return chatOperations.sendMessage(message, responder)
-        case "SEND_GROUP_MSG":
-            return chatOperations.sendGroupMessage(message, responder)
-        default:
-            return responder.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE)
-    }
+  switch (message.reqType) {
+    case "SEND_MSG":
+      return chatOperations.sendMessage(message, responder)
+    case "SEND_GROUP_MSG":
+      return chatOperations.sendGroupMessage(message, responder)
+    case "SET_IS_TYPING":
+      return chatOperations.setIsTyping(message, responder)
+    case "IS_USER_ONLINE":
+      return chatOperations.getUserIsOnline(message, responder)
+    case "SET_IS_ONLINE":
+      return chatOperations.setIsOnline(message, responder)
+    default:
+      return responder.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE)
+  }
 }
 
 function accountRouter(responder: WebSocketResponder, message: WSAccountRequest) {
-    switch (message.reqType) {
-        case "GET_CONTACTS":
-            return accountsOperations.getContacts(responder)
-        case "GET_GROUPS":
-            return accountsOperations.getGroups(responder)
-        case "MAKE_REQUEST":
-            return accountsOperations.makeFriendRequest(responder, message)
-        case "ACCEPT_REQUEST":
-            return accountsOperations.acceptFriendRequest(responder, message)
-        case "QUERY_ACCOUNTS":
-            return accountsOperations.queryAccounts(responder, message)
-        case "RECOMMENDED_ACCOUNTS":
-            return accountsOperations.getAccountsRecommendation(responder, message)
-        case "PRIVATE_CHAT_HISTORY":
-            return accountsOperations.getPrivateChatHistory(responder, message)
-        case "GROUP_CHAT_HISTORY":
-            return accountsOperations.getGroupChatHistory(responder, message)
-        case "UPDATE_PROFILE":
-            return accountsOperations.updateAccount(responder, message)
-        default:
-            return responder.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE)
-    }
+  switch (message.reqType) {
+    case "GET_CONTACTS":
+      return accountsOperations.getContacts(responder)
+    case "GET_GROUPS":
+      return accountsOperations.getGroups(responder)
+    case "MAKE_REQUEST":
+      return accountsOperations.makeFriendRequest(responder, message)
+    case "ACCEPT_REQUEST":
+      return accountsOperations.acceptFriendRequest(responder, message)
+    case "QUERY_ACCOUNTS":
+      return accountsOperations.queryAccounts(responder, message)
+    case "RECOMMENDED_ACCOUNTS":
+      return accountsOperations.getAccountsRecommendation(responder, message)
+    case "PRIVATE_CHAT_HISTORY":
+      return accountsOperations.getPrivateChatHistory(responder, message)
+    case "GROUP_CHAT_HISTORY":
+      return accountsOperations.getGroupChatHistory(responder, message)
+    case "UPDATE_PROFILE":
+      return accountsOperations.updateAccount(responder, message)
+    default:
+      return responder.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE)
+  }
 }
 
 function notificationRouter(responder: WebSocketResponder, message: WSNotificationRequest) {
-    switch (message.reqType) {
-        case "CHECK_NOTIFICATIONS":
-            return notificationsOperations.checkNotifications(responder)
-        case "GET_ACCOUNT_REQUESTS_NOTIFICATIONS":
-            return notificationsOperations.getAccountRequestNotifications(responder)
-        default:
-            return responder.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE)
-    }
+  switch (message.reqType) {
+    case "CHECK_NOTIFICATIONS":
+      return notificationsOperations.checkNotifications(responder)
+    case "GET_ACCOUNT_REQUESTS_NOTIFICATIONS":
+      return notificationsOperations.getAccountRequestNotifications(responder)
+    default:
+      return responder.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE)
+  }
 }
