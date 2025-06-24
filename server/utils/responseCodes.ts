@@ -5,6 +5,7 @@ const ErrorCodes = {
     UNKNOWN_ACTION_TYPE: 4005,
     INTERNAL_SERVER_ERROR: 500,
     GROUP_NOT_FOUND: 4006,
+    INVALID_CREDENTIALS: 4007,
 };
 
 const SuccessCodes = {

@@ -41,21 +41,43 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
 
                 let user = await User.findOne({ email: req.data.email }) as IUser;
 
-                if (!user) {
-                    const newUser = new User({
-                        username: req.data.userName ?? req.data.email,
-                        firstName: req.data.userName!.split(" ")[0],
-                        lastName: req.data.userName!.split(" ").slice(1).join(" "),
-                        email: req.data.email,
-                        imageURL: req.data.profileImage,
-                        contacts: [],
-                        friendRequests: [],
-                    });
-
-                    user = await newUser.save();
+                // if trying to login with password
+                if (req.reqType === "AUTHENTICATE_WITH_PASSWORD") {
                     if (!user) {
-                        responseHandler.closeClient(ErrorCodes.INTERNAL_SERVER_ERROR);
+                        responseHandler.closeClient(ErrorCodes.USER_NOT_FOUND);
                         return resolve(failedCase);
+                    }
+
+                    if (user.password) {
+                        if (user.password !== req.data.password) {
+                            responseHandler.closeClient(ErrorCodes.INVALID_CREDENTIALS);
+                            return resolve(failedCase);
+                        }
+                    } else {
+                        responseHandler.closeClient(ErrorCodes.USER_NOT_FOUND);
+                        return resolve(failedCase);
+                    }
+
+                }
+                
+                // if trying to login with google
+                else {
+                    if (!user) {
+                        const newUser = new User({
+                            username: req.data.userName ?? req.data.email,
+                            firstName: req.data.userName!.split(" ")[0],
+                            lastName: req.data.userName!.split(" ").slice(1).join(" "),
+                            email: req.data.email,
+                            imageURL: req.data.profileImage,
+                            contacts: [],
+                            friendRequests: [],
+                        });
+
+                        user = await newUser.save();
+                        if (!user) {
+                            responseHandler.closeClient(ErrorCodes.INTERNAL_SERVER_ERROR);
+                            return resolve(failedCase);
+                        }
                     }
                 }
 
@@ -67,6 +89,8 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
                     data: {
                         accessToken: generateAccessToken(uId, user.email),
                         refreshToken: generateRefreshToken(uId, user.email),
+                        userId: uId,
+                        profileImage: user.image
                     }
                 };
 
