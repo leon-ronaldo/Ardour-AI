@@ -39,6 +39,12 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
                     return resolve(failedCase);
                 }
 
+                if (!req.data.FCMtoken) {
+                    responseHandler.invalidParametersError();
+                    responseHandler.closeClient();
+                    return resolve(failedCase);
+                }
+
                 let user = await User.findOne({ email: req.data.email }) as IUser;
 
                 // if trying to login with password
@@ -52,6 +58,13 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
                         if (user.password !== req.data.password) {
                             responseHandler.closeClient(ErrorCodes.INVALID_CREDENTIALS);
                             return resolve(failedCase);
+                        } else {
+                            user.FCMtoken = req.data.FCMtoken;
+                            user = await user.save();
+                            if (!user) {
+                                responseHandler.closeClient(ErrorCodes.INTERNAL_SERVER_ERROR);
+                                return resolve(failedCase);
+                            }
                         }
                     } else {
                         responseHandler.closeClient(ErrorCodes.USER_NOT_FOUND);
@@ -59,7 +72,7 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
                     }
 
                 }
-                
+
                 // if trying to login with google
                 else {
                     if (!user) {
@@ -71,9 +84,18 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
                             imageURL: req.data.profileImage,
                             contacts: [],
                             friendRequests: [],
+                            FCMtoken: req.data.FCMtoken
                         });
 
                         user = await newUser.save();
+                        if (!user) {
+                            responseHandler.closeClient(ErrorCodes.INTERNAL_SERVER_ERROR);
+                            return resolve(failedCase);
+                        }
+                    } else {
+                        user.FCMtoken = req.data.FCMtoken;
+
+                        user = await user.save();
                         if (!user) {
                             responseHandler.closeClient(ErrorCodes.INTERNAL_SERVER_ERROR);
                             return resolve(failedCase);
@@ -109,7 +131,7 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
         // handle authentication
 
         if (!token) {
-            responseHandler.invalidParametersError();
+            responseHandler.closeClient(ErrorCodes.TOKEN_NOT_PROVIDED);
             return failedCase;
         }
 

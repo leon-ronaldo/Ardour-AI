@@ -4,6 +4,7 @@ import 'package:ardour_ai/app/data/websocket_models.dart';
 import 'package:ardour_ai/app/data/websocket_service.dart';
 import 'package:ardour_ai/app/routes/app_pages.dart';
 import 'package:ardour_ai/app/utils/widgets/snackbar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
@@ -101,7 +102,12 @@ class AuthenticationController extends GetxController {
       final request = WSBaseRequest(
         type: WSModuleType.Authentication,
         reqType: "",
-        data: {"email": email, "userName": name, "profileImage": photo},
+        data: {
+          "email": email,
+          "userName": name,
+          "profileImage": photo,
+          "FCMtoken": await FirebaseMessaging.instance.getToken(),
+        },
         // data: {"email": "jane.smith@example.com", "userName": "jane_smith", "profileImage": photo},
       );
 
@@ -115,7 +121,7 @@ class AuthenticationController extends GetxController {
     }
   }
 
-  void signInWithEmail() {
+  Future<void> signInWithEmail() async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
@@ -133,7 +139,7 @@ class AuthenticationController extends GetxController {
       WSBaseRequest(
         type: WSModuleType.Authentication,
         reqType: "AUTHENTICATE_WITH_PASSWORD",
-        data: {"email": email, "password": password},
+        data: {"email": email, "password": password, "FCMtoken": await FirebaseMessaging.instance.getToken()},
       ),
     );
   }

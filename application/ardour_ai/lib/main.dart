@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:ardour_ai/app/data/storage_service.dart';
 import 'package:ardour_ai/app/data/websocket_service.dart';
+import 'package:ardour_ai/firebase_notifications.dart';
 import 'package:ardour_ai/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,8 @@ import 'app/routes/app_pages.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  LocalNotificationService.initialize();
+  NotificationService().initNotifications();
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.dumpErrorToConsole(details);
   };
@@ -45,6 +49,7 @@ class MainController {
 
   // utils
   static final storage = FlutterSecureStorage();
+  static final storageService = StorageServices();
 
   static Future<String?> get accessToken async =>
       await storage.read(key: "accessToken");

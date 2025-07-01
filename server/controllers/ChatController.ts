@@ -6,20 +6,19 @@ import { ErrorCodes } from "../utils/responseCodes";
 import ChatPool, { IChatMessage, generateChatId } from "../models/ChatPool";
 import UserModel from "../models/User";
 import GroupChatPool, { IGroupChatMessage } from "../models/GroupChatPool";
+import { sendNotification } from "./sendNotification";
 
 async function sendMessage(message: WSChatRequest, responseHandler: WebSocketResponder) {
     const data = message.data as IChatMessage;
 
     const recipientId = data.to;
 
-    // Step 1: Fetch recipient user
     const recipient = await UserModel.findById(recipientId);
     if (!recipient) {
         responseHandler.sendMessageFromCode(ErrorCodes.USER_NOT_FOUND);
         return;
     }
 
-    // Step 2: Generate consistent chatId
     const chatId = generateChatId(
         responseHandler.user!._id.toString(),
         recipientId,
@@ -27,49 +26,44 @@ async function sendMessage(message: WSChatRequest, responseHandler: WebSocketRes
         recipient.createdOn.toISOString()
     );
 
-    // Step 3: Create message
-    const newMessage: IChatMessage = {
-        from: responseHandler.user!._id.toString(),
-        to: recipientId,
-        message: data.message,
-        timestamp: data.timestamp
-    };
-
-    // Step 4: Check if recipient is online
-    const liveClient = clientManager.getClient(recipientId);
-    if (liveClient) {
-        const incomingMessage: WSChatResponse = {
-            type: "Chat",
-            resType: "PRIVATE_CHAT_MESSAGE",
-            data: newMessage
-        };
-
-        console.log("brooo", liveClient);
-
-        liveClient.send(JSON.stringify({ data: incomingMessage }));
-    }
-
-    // Step 5. store in chatpool
     let chatPool = await ChatPool.findOne({ chatId });
 
-    console.log(chatPool);
+    // console.log(chatPool);
 
     if (!chatPool) {
         // Create new chat pool
         chatPool = new ChatPool({
             chatId,
             participants: [responseHandler.user!._id.toString(), recipientId].sort(),
-            messages: [newMessage]
+            messages: [data]
         });
-
-        console.log("gotha", chatPool);
 
         await chatPool.save();
     } else {
-        chatPool.messages.push(newMessage);
+        chatPool.messages.push(data);
         await chatPool.save();
+    }
 
-        console.log("ada dei", chatPool)
+    console.log("chatPool after saving", chatPool);
+
+    const liveClient = clientManager.getClient(recipientId);
+    if (liveClient) {
+        const incomingMessage: WSChatResponse = {
+            type: "Chat",
+            resType: "PRIVATE_CHAT_MESSAGE",
+            data: data
+        };
+
+        liveClient.send(JSON.stringify({ data: incomingMessage }));
+    } else {
+        console.log("bro client illa");
+        await sendNotification(
+            recipientId,
+            "New Message",
+            responseHandler.user!.username,
+            data.message,
+            { notificationType: "PERSONAL_CHAT", "senderId": recipientId }
+        );
     }
 }
 

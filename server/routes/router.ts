@@ -66,6 +66,8 @@ function accountRouter(responder: WebSocketResponder, message: WSAccountRequest)
       return accountsOperations.getGroupChatHistory(responder, message)
     case "UPDATE_PROFILE":
       return accountsOperations.updateAccount(responder, message)
+    case "GET_RECENT_CHATS_LIST":
+      return accountsOperations.getRecentChatsList(responder)
     default:
       return responder.sendMessageFromCode(ErrorCodes.UNKNOWN_ACTION_TYPE)
   }

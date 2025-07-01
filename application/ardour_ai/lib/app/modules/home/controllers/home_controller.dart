@@ -12,8 +12,6 @@ class HomeController extends GetxController {
   RxBool isReady = false.obs;
   RxBool haveNotifications = false.obs;
 
-  StorageServices storageServices = StorageServices();
-
   @override
   void onInit() {
     super.onInit();
@@ -85,7 +83,7 @@ class HomeController extends GetxController {
     // get contacts
     if (DateTime.now()
             .difference(
-              (await storageServices.lastDateOfFetchedContacts ??
+              (await MainController.storageService.lastDateOfFetchedContacts ??
                   DateTime(2004, 8, 29)),
             ) // just a fallback time
             .inDays >
@@ -132,7 +130,7 @@ class HomeController extends GetxController {
     switch (response.resType) {
       case AccountResType.CONTACT_LIST:
         print("Received contacts: ${response.data}");
-        storageServices.writeContacts(response.data['contacts']);
+        MainController.storageService.writeContacts(response.data['contacts']);
         break;
       case AccountResType.GROUPS_LIST:
         break;
