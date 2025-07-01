@@ -1,4 +1,6 @@
+import 'package:ardour_ai/app/data/models.dart';
 import 'package:ardour_ai/app/utils/theme/colors.dart';
+import 'package:ardour_ai/app/utils/tools/timeFunctions.dart';
 import 'package:ardour_ai/app/utils/widgets/chat_widgets.dart';
 import 'package:ardour_ai/app/utils/widgets/navbars.dart';
 import 'package:ardour_ai/main.dart';
@@ -14,14 +16,74 @@ class PersonalChatView extends GetView<PersonalChatController> {
   PersonalChatView({super.key});
 
   final TextStyle baseInfoStyle = GoogleFonts.poppins(
-    fontSize: 14,
+    fontSize: 12,
     color: Colors.white,
   );
 
   final TextStyle highLightedInfoStyle = GoogleFonts.poppins(
-    fontSize: 14,
+    fontSize: 12,
     color: Colors.yellowAccent.shade700,
   );
+
+  Widget buildChatBubble(ChatMessage chat, bool isSender) {
+    final repliedTo = controller.repliedToMessage;
+
+    if (isSender) {
+      if (chat.isLiveMessage) {
+        return SenderChatAnimated(message: chat, repliedTo: repliedTo);
+      } else if (chat.repliedTo != null) {
+        print("naa adhu vanthiruku ${chat.toJson()}");
+        final repliedMessage = controller.chats.firstWhereOrNull(
+          (message) =>
+              (message.id ?? "no id dude") == (chat.repliedTo ?? "no bro!"),
+        );
+
+        if (repliedMessage != null) {
+          repliedMessage.senderName =
+              repliedMessage.from == controller.contact.userId
+                  ? controller.contact.userName
+                  : "You";
+          return SenderRepliedChat(
+            message: chat,
+            repliedTo: repliedTo,
+            repliedMessage: repliedMessage,
+          );
+        } else {
+          print("naa adhu vanthiruku aprm kanom ${chat.toJson()}");
+          return SenderChat(message: chat, repliedTo: repliedTo);
+        }
+      } else {
+        return SenderChat(message: chat, repliedTo: repliedTo);
+      }
+    } else {
+      if (chat.isLiveMessage) {
+        return RecieverChatAnimated(message: chat, repliedToMessage: repliedTo);
+      } else if (chat.repliedTo != null) {
+        print("naa adhu vanthiruku ${chat.toJson()}");
+        final repliedMessage = controller.chats.firstWhereOrNull(
+          (message) =>
+              (message.id ?? "no id dude") == (chat.repliedTo ?? "no bro!"),
+        );
+
+        if (repliedMessage != null) {
+          repliedMessage.senderName =
+              repliedMessage.from == controller.contact.userId
+                  ? controller.contact.userName
+                  : "You";
+          return RecieverRepliedChat(
+            message: chat,
+            repliedToMessage: repliedTo,
+            repliedMessage: repliedMessage,
+          );
+        } else {
+          print("naa adhu vanthiruku aprm kanom ${chat.toJson()}");
+          return SenderChat(message: chat, repliedTo: repliedTo);
+        }
+      } else {
+        return RecieverChat(message: chat, repliedToMessage: repliedTo);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +113,11 @@ class PersonalChatView extends GetView<PersonalChatController> {
                             () => ListView.builder(
                               key: controller.chatSectionKey,
                               controller: controller.chatScrollController,
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              itemCount: controller.chats.length + 2,
+                              padding: EdgeInsets.only(
+                                top: 10,
+                                bottom: controller.chatFieldHeight.value,
+                              ),
+                              itemCount: controller.chats.length + 1,
                               itemBuilder: (context, index) {
                                 if (index == 0) {
                                   return FTContainer(
@@ -89,30 +154,79 @@ class PersonalChatView extends GetView<PersonalChatController> {
                                     ..my = 20;
                                 }
 
-                                if (index == controller.chats.length + 1) {
-                                  return SizedBox(height: 80);
-                                }
-
-                                final chat = controller.chats[index - 1];
+                                final framedIndex = index - 1;
+                                final chat = controller.chats[framedIndex];
                                 final isSender =
                                     chat.from == controller.userId!;
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 4,
-                                  ),
-                                  child:
-                                      isSender
-                                          ? chat.isLiveMessage
-                                              ? SenderChatAnimated(
-                                                text: chat.message,
-                                              )
-                                              : SenderChat(text: chat.message)
-                                          : chat.isLiveMessage
-                                          ? RecieverChatAnimated(
-                                            text: chat.message,
+
+                                if (framedIndex == 0) {
+                                  return Column(
+                                    children: [
+                                      FTContainer(
+                                          child: Text(
+                                            formatSmartTimestamp(
+                                              chat.timestamp,
+                                              today: "Today",
+                                            ),
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 9,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        )
+                                        ..mb = 50
+                                        ..mt = 20
+                                        ..px = 15
+                                        ..py = 5
+                                        ..borderRadius = FTBorderRadii.roundedLg
+                                        ..bgColor = Color(0xff1d1f1f),
+
+                                      buildChatBubble(chat, isSender),
+                                    ],
+                                  );
+                                } else {
+                                  final previousChat =
+                                      controller.chats[framedIndex - 1];
+
+                                  if (!isSameDate(
+                                    previousChat.timestamp,
+                                    chat.timestamp,
+                                  )) {
+                                    return Column(
+                                      children: [
+                                        FTContainer(
+                                            child: Text(
+                                              formatSmartTimestamp(
+                                                chat.timestamp,
+                                                today: "Today",
+                                              ),
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 9,
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                           )
-                                          : RecieverChat(text: chat.message),
-                                );
+                                          ..my = 50
+                                          ..px = 15
+                                          ..py = 5
+                                          ..borderRadius =
+                                              FTBorderRadii.roundedLg
+                                          ..bgColor = Color(0xff1d1f1f),
+
+                                        buildChatBubble(chat, isSender),
+                                      ],
+                                    );
+                                  } else {
+                                    return previousChat.from != chat.from
+                                        ? Column(
+                                          children: [
+                                            SizedBox(height: 15),
+                                            buildChatBubble(chat, isSender),
+                                          ],
+                                        )
+                                        : buildChatBubble(chat, isSender);
+                                  }
+                                }
                               },
                             ),
                           ),
@@ -125,8 +239,10 @@ class PersonalChatView extends GetView<PersonalChatController> {
             ),
 
             ChatTextField(
+              key: controller.chatFieldKey,
               textEditingController: controller.chatTextController,
               onSubmit: controller.sendText,
+              repliedTo: controller.repliedToMessage,
             ),
           ],
         ),

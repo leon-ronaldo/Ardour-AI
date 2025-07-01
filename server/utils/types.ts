@@ -1,4 +1,4 @@
-import { IChatMessage } from "../models/ChatPool";
+import { ContactWithPreview, IChatMessage } from "../models/ChatPool";
 import { IGroupChatMessage } from "../models/GroupChatPool";
 import { AccountReqNotification, IPassAccountReqNotification, IPassUser } from "../models/User";
 
@@ -15,6 +15,7 @@ export type AccountReqType = "UPDATE_PROFILE"
   | "GET_GROUPS"
   | "RECOMMENDED_ACCOUNTS"
   | "PRIVATE_CHAT_HISTORY"
+  | "GET_RECENT_CHATS_LIST"
   | "GROUP_CHAT_HISTORY"
   | "QUERY_ACCOUNTS"
   | "MAKE_REQUEST"
@@ -24,6 +25,7 @@ export type AccountResType = "PROFILE_UPDATED"
   | "GROUPS_LIST"
   | "QUERY_ACCOUNTS_LIST"
   | "ACCOUNT_REQUEST_MADE"
+  | "RECENT_CHATS_LIST"
   | "ACCOUNT_REQUEST_ACCEPTED"
   | "RECOMMENDED_ACCOUNTS_LIST"
   | "PRIVATE_CHAT_HISTORY"
@@ -86,7 +88,8 @@ export type WSAccountRequest =
   | WSBaseRequest<"Account", "PRIVATE_CHAT_HISTORY", { userId: string }>
   | WSBaseRequest<"Account", "GROUP_CHAT_HISTORY", { groupId: string }>
   | WSBaseRequest<"Account", "GET_CONTACTS">
-  | WSBaseRequest<"Account", "GET_GROUPS">;
+  | WSBaseRequest<"Account", "GET_GROUPS">
+  | WSBaseRequest<"Account", "GET_RECENT_CHATS_LIST">;
 
 // NOTIFICATION MODULE
 export type WSNotificationRequest =
@@ -104,8 +107,8 @@ export type WSChatRequest =
 
 // AUTHENTICATION MODULE
 export type WSAuthenticationRequest =
-  WSBaseRequest<"Authentication", "AUTHENTICATE", { email: string, profileImage?: string, userName?: string }>
-  | WSBaseRequest<"Authentication", "AUTHENTICATE_WITH_PASSWORD", { email: string, password: string }>
+  WSBaseRequest<"Authentication", "AUTHENTICATE", { email: string, profileImage?: string, userName?: string, FCMtoken: string }>
+  | WSBaseRequest<"Authentication", "AUTHENTICATE_WITH_PASSWORD", { email: string, password: string, FCMtoken: string }>
 
 // UNION TYPE FOR ALL REQUESTS
 export type WSClientRequest = WSAccountRequest | WSChatRequest | WSAuthenticationRequest | WSNotificationRequest;
@@ -120,7 +123,8 @@ export type WSAccountResponse =
   | WSBaseResponse<"Account", "QUERY_ACCOUNTS_LIST", { matchedQueries: IPassUser[] }>
   | WSBaseResponse<"Account", "RECOMMENDED_ACCOUNTS_LIST", { recommendedUsers: IPassUser[] }>
   | WSBaseResponse<"Account", "PRIVATE_CHAT_HISTORY", { userId: string, messages: IChatMessage[] }>
-  | WSBaseResponse<"Account", "GROUP_CHAT_HISTORY", { groupId: string; messages: IGroupChatMessage[] }>;
+  | WSBaseResponse<"Account", "GROUP_CHAT_HISTORY", { groupId: string; messages: IGroupChatMessage[] }>
+  | WSBaseResponse<"Account", "RECENT_CHATS_LIST", { recentChats: ContactWithPreview[] }>;
 
 
 // NOTIFICATION MODULE

@@ -40,6 +40,7 @@ export interface IUser extends Document {
   contacts: mongoose.Types.ObjectId[];
   notifications: IUserNotification;
   createdOn: Date;
+  FCMtoken?: string;
 }
 
 const UserSchema = new mongoose.Schema<IUser>({
@@ -51,6 +52,7 @@ const UserSchema = new mongoose.Schema<IUser>({
   email: { type: String, required: true, unique: true },
   contacts: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  FCMtoken: { type: String },
   notifications: {
     type: {
       postNotifications: {

@@ -18,6 +18,7 @@ class AccountReqType {
   static const String RECOMMENDED_ACCOUNTS = "RECOMMENDED_ACCOUNTS";
   static const String MAKE_REQUEST = "MAKE_REQUEST";
   static const String ACCEPT_REQUEST = "ACCEPT_REQUEST";
+  static const String GET_RECENT_CHATS_LIST = "GET_RECENT_CHATS_LIST";
 }
 
 class AccountResType {
@@ -29,6 +30,7 @@ class AccountResType {
   static const String RECOMMENDED_ACCOUNTS_LIST = "RECOMMENDED_ACCOUNTS_LIST";
   static const String ACCOUNT_REQUEST_MADE = "ACCOUNT_REQUEST_MADE";
   static const String ACCOUNT_REQUEST_ACCEPTED = "ACCOUNT_REQUEST_ACCEPTED";
+  static const String RECENT_CHATS_LIST = "RECENT_CHATS_LIST";
 }
 
 class ChatReqType {

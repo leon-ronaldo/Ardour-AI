@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:ardour_ai/app/data/messages_models.dart';
+
 class InvalidPassUserParameters extends Error {}
 
 class PassUser {
@@ -116,36 +118,52 @@ class ChatMessage {
   final String to;
   final String message;
   final int timestamp;
+  final String? id;
 
-  bool _isLiveMessage;
+  bool isRead;
+  bool isLiveMessage;
+  String? repliedTo;
+
+  String senderName;
 
   ChatMessage({
     required this.from,
     required this.to,
     required this.message,
     required this.timestamp,
-    bool isLiveMessage = false,
-  }) : _isLiveMessage = isLiveMessage;
-
-  // Getter for isLiveMessage
-  bool get isLiveMessage => _isLiveMessage;
-
-  // Setter for isLiveMessage
-  set isLiveMessage(bool value) => _isLiveMessage = value;
+    this.senderName = "Username Not Set",
+    this.isLiveMessage = false,
+    this.isRead = false,
+    this.repliedTo,
+    this.id
+  });
 
   /// Factory to create from JSON
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    print("chat mamae $json");
     return ChatMessage(
       from: json['from'],
       to: json['to'],
       message: json['message'],
       timestamp: json['timestamp'],
+      isRead: json['isRead'] ?? false,
+      isLiveMessage: json['isLiveMessage'] ?? false,
+      repliedTo: json['repliedTo'],
+      id: json['_id']
     );
   }
 
   /// Convert to JSON
   Map<String, dynamic> toJson() {
-    return {'from': from, 'to': to, 'message': message, 'timestamp': timestamp};
+    return {
+      'from': from,
+      'to': to,
+      'message': message,
+      'timestamp': timestamp,
+      'isRead': isRead,
+      'isLiveMessage': isLiveMessage,
+      if (repliedTo != null) 'repliedTo': repliedTo,
+    };
   }
 
   /// Optional: Format timestamp to human-readable time
@@ -179,4 +197,11 @@ class PersonalChat {
       'messages': messages.map((e) => e.toJson()).toList(),
     };
   }
+}
+
+class ContactWithPreview {
+  final PassUser contact;
+  final List<ChatMessage>? recentMessages;
+
+  ContactWithPreview({this.recentMessages, required this.contact});
 }

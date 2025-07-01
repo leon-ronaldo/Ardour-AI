@@ -6,24 +6,34 @@ import 'package:ardour_ai/app/data/models.dart';
 import 'package:ardour_ai/app/data/storage_service.dart';
 import 'package:ardour_ai/app/data/websocket_models.dart';
 import 'package:ardour_ai/app/routes/app_pages.dart';
+import 'package:ardour_ai/app/utils/tools/debouncer.dart';
 import 'package:ardour_ai/app/utils/widgets/snackbar.dart';
 import 'package:ardour_ai/main.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class PersonalChatController extends GetxController {
   late PassUser contact;
   final StorageServices storageService = StorageServices();
+  final AudioPlayer audioPlayer = AudioPlayer();
 
   RxList<ChatMessage> chats = <ChatMessage>[].obs;
+  Rx<ChatMessage?> repliedToMessage = Rx<ChatMessage?>(null);
+
   RxBool isReady = false.obs;
   RxBool isOnline = false.obs;
   RxBool isTyping = false.obs;
+
+  RxDouble chatFieldHeight = 80.0.obs;
+  final GlobalKey chatFieldKey = GlobalKey();
+
   String? userId;
 
   final ScrollController chatScrollController = ScrollController();
   final TextEditingController chatTextController = TextEditingController();
   final GlobalKey chatSectionKey = GlobalKey();
+  final Debouncer debouncer = Debouncer(duration: Duration(milliseconds: 500));
 
   @override
   void onInit() {
@@ -35,6 +45,18 @@ class PersonalChatController extends GetxController {
     setIsTypingInformer();
     Future.delayed(Duration(milliseconds: 500), askContactIsOnline);
     Future.delayed(Duration(seconds: 2), askContactIsOnline);
+
+    ever(repliedToMessage, (value) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final box =
+            chatFieldKey.currentContext?.findRenderObject() as RenderBox?;
+        if (box != null) {
+          final height = box.size.height;
+          chatFieldHeight.value = height;
+          print("nan mathiten laa ${chatFieldHeight.value}");
+        }
+      });
+    });
   }
 
   @override
@@ -45,6 +67,14 @@ class PersonalChatController extends GetxController {
     );
     sendIsOnline(false);
     super.onClose();
+  }
+
+  void playMessageSentSound() {
+    audioPlayer.play(AssetSource("audio/message-send.mp3"));
+  }
+
+  void playMessageRecievedSound() {
+    audioPlayer.play(AssetSource("audio/message-recieve.wav"));
   }
 
   void initialize() async {
@@ -74,6 +104,15 @@ class PersonalChatController extends GetxController {
       a.timestamp,
     ).compareTo(DateTime.fromMillisecondsSinceEpoch(b.timestamp)),
   );
+
+  void scrollToBottomSafely() {
+    if (chatScrollController.hasClients)
+      chatScrollController.animateTo(
+        chatScrollController.position.maxScrollExtent + 50,
+        duration: Durations.medium1,
+        curve: Curves.easeIn,
+      );
+  }
 
   void sendIsOnline(bool isOnline) {
     MainController.service.send(
@@ -140,6 +179,7 @@ class PersonalChatController extends GetxController {
               addMessageToChat(
                 ChatMessage.fromJson(coreData['data'])..isLiveMessage = true,
               );
+              debouncer.run(playMessageRecievedSound);
               break;
             case ChatResType.USER_TYPING_STATUS:
               if (coreData['data']['userId'] == contact.userId)
@@ -164,7 +204,17 @@ class PersonalChatController extends GetxController {
         ),
       ];
 
+      chats.add(
+        ChatMessage(
+          from: contact.userId,
+          to: "684b0ab50e2c9ca1d99925c0",
+          message: "Funny LOL",
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+        )..repliedTo = "6862b528a861f8be5ec931dd",
+      );
+
       sortChats();
+      scrollToBottomSafely();
     } on Exception catch (e) {
       errorMessage(
         title: "Issue while fetching messages",
@@ -174,28 +224,32 @@ class PersonalChatController extends GetxController {
   }
 
   void addMessageToChat(ChatMessage message) {
-    // final renderBox =
-    //     chatSectionKey.currentContext?.findRenderObject() as RenderBox?;
+    repliedToMessage.value = null;
     chats.add(message);
 
     if (chatScrollController.position.maxScrollExtent > 0.0) {
-      chatScrollController.animateTo(
-        chatScrollController.position.maxScrollExtent + 80,
-        duration: Durations.medium1,
-        curve: Curves.easeIn,
-      );
+      scrollToBottomSafely();
     }
+
+    debouncer.run(playMessageSentSound);
   }
 
   void sendText() {
     final message = chatTextController.text.trim();
     if (message.isNotEmpty) {
-      final chatMessage = ChatMessage(
+      ChatMessage chatMessage = ChatMessage(
         from: userId ?? "unknown",
         to: contact.userId,
         message: message,
         timestamp: DateTime.now().millisecondsSinceEpoch,
       );
+
+      if (repliedToMessage.value != null) {
+        chatMessage.repliedTo = repliedToMessage.value?.id;
+      }
+
+      print("anupa pothu chat epdi na ${chatMessage.toJson()}");
+
       MainController.service.send(
         WSBaseRequest(
           type: WSModuleType.Chat,
@@ -203,6 +257,7 @@ class PersonalChatController extends GetxController {
           data: chatMessage.toJson(),
         ),
       );
+
       addMessageToChat(chatMessage..isLiveMessage = true);
       chatTextController.clear();
       FocusManager.instance.primaryFocus?.unfocus();

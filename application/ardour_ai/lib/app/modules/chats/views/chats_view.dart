@@ -114,25 +114,36 @@ class ChatsView extends GetView<ChatsController> {
                       controller.isReady.value
                           ? Column(
                             children:
-                                controller.contacts
-                                    .map(
-                                      (contact) => InkResponse(
-                                        onTap: () {
-                                          Get.toNamed(
-                                            Routes.PERSONAL_CHAT,
-                                            arguments: {'contact': contact},
-                                          );
-                                        },
-                                        child: ChatCard(
-                                          name: contact.userName,
-                                          image:
-                                              contact.profileImage ??
-                                              "assets/images/sample/raul.jpg",
-                                          unreadMessages: null,
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
+                                controller.recentChatsList.map((account) {
+                                  final chat = account.recentMessages;
+                                  String caption =
+                                      "Messages are end-to-end encrypted";
+                                  int? timestamp;
+                                  if (chat != null) {
+                                    if (chat.isNotEmpty) {
+                                      caption =
+                                          "${chat.last.from == account.contact.userId ? "" : "You: "}${chat.last.message}";
+                                      timestamp = chat.last.timestamp;
+                                    }
+                                  }
+                                  return InkResponse(
+                                    onTap: () {
+                                      Get.toNamed(
+                                        Routes.PERSONAL_CHAT,
+                                        arguments: {'contact': account.contact},
+                                      );
+                                    },
+                                    child: ChatCard(
+                                      name: account.contact.userName,
+                                      image:
+                                          account.contact.profileImage ??
+                                          "assets/images/sample/raul.jpg",
+                                      unreadMessages: null,
+                                      caption: caption,
+                                      timeStamp: timestamp,
+                                    ),
+                                  );
+                                }).toList(),
                           )
                           : PlaceHolderLoader(),
 

@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:ardour_ai/app/data/models.dart';
-import 'package:ardour_ai/main.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class StorageServices {
@@ -78,6 +77,15 @@ class StorageServices {
     await _storage.write(key: PERSONAL_CHATS, value: updatedJson);
   }
 
+  Future<List<PersonalChat>> readAllPersonalChats() async {
+    final jsonString = await _storage.read(key: PERSONAL_CHATS);
+
+    if (jsonString == null || jsonString.isEmpty) return [];
+
+    final decoded = jsonDecode(jsonString);
+    return (decoded as List).map((e) => PersonalChat.fromJson(e)).toList();
+  }
+
   Future<PersonalChat?> readPersonalChat(String contactId) async {
     final jsonString = await _storage.read(key: PERSONAL_CHATS);
 
@@ -87,8 +95,10 @@ class StorageServices {
     final allChats =
         (decoded as List).map((e) => PersonalChat.fromJson(e)).toList();
 
-    return allChats.firstWhere(
-      (chat) => chat.contactId == contactId,
-    );
+    try {
+      return allChats.firstWhere((chat) => chat.contactId == contactId);
+    } catch (e) {
+      return null;
+    }
   }
 }

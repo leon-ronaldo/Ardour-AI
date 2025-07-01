@@ -1,4 +1,4 @@
-import ChatPool, { IChatMessage, generateChatId } from "../models/ChatPool";
+import ChatPool, { ContactWithPreview, IChatMessage, IChatPool, generateChatId } from "../models/ChatPool";
 import GroupChatPool, { IGroupChatMessage } from "../models/GroupChatPool";
 import UserModel, { IPassUser, IUser } from "../models/User";
 import mongoose from "mongoose";
@@ -296,6 +296,74 @@ async function acceptFriendRequest(responseHandler: WebSocketResponder, message:
     }
 }
 
+export async function getRecentChatsList(responseHandler: WebSocketResponder) {
+    const user: IUser = responseHandler.user!;
+    const userIdStr = user._id.toString();
+
+    const contacts = user.contacts.map((id) => id.toString());
+
+    // Load all ChatPools involving this user
+    const chatPools: IChatPool[] = await ChatPool.find({
+        participants: userIdStr,
+    }).lean();
+
+    // Build a map for quick lookup
+    const chatMap = new Map<string, IChatPool>();
+    for (const chat of chatPools) {
+        const otherId = chat.participants.find((id) => id !== userIdStr)!;
+        chatMap.set(otherId, chat);
+    }
+
+    // Load full user objects for all contacts
+    const users = await UserModel.find({
+        _id: { $in: contacts },
+    }).lean();
+
+    // Define contact structure with optional messages
+    const result: ContactWithPreview[] = [];
+
+    for (let i = 0; i < users.length; i++) {
+        const contactUser = users[i];
+        const contactId = contactUser._id.toString();
+
+        const passUser: IPassUser = {
+            userName: contactUser.username,
+            userId: contactId,
+            profileImage: contactUser.image,
+        };
+
+        const chat = chatMap.get(contactId);
+
+        if (chat) {
+            const recentMessages = [...chat.messages]
+                .sort((a, b) => b.timestamp - a.timestamp) // newest first
+                .slice(0, 5)                               // top 5 recent
+                .sort((a, b) => a.timestamp - b.timestamp); // back to oldest first
+
+            result.push({ contact: passUser, recentMessages });
+        } else {
+            result.push({ contact: passUser });
+        }
+    }
+
+    result.sort((a, b) => {
+        const aLast = a.recentMessages?.at(-1)?.timestamp ?? 0;
+        const bLast = b.recentMessages?.at(-1)?.timestamp ?? 0;
+        return bLast - aLast;
+    });
+
+    const response: WSAccountResponse = {
+        type: "Account",
+        resType: "RECENT_CHATS_LIST",
+        data: {
+            recentChats: result,
+        },
+    };
+
+    responseHandler.sendData(response);
+}
+
+
 export default {
     getContacts,
     getGroups,
@@ -305,5 +373,6 @@ export default {
     getAccountsRecommendation,
     updateAccount,
     makeFriendRequest,
-    acceptFriendRequest
+    acceptFriendRequest,
+    getRecentChatsList,
 }

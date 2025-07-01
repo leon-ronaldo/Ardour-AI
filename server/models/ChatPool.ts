@@ -1,11 +1,15 @@
 import mongoose, { Schema, Document } from "mongoose";
 import crypto from "crypto";
+import { IPassUser } from "./User";
 
 export interface IChatMessage {
   from: string;
   to: string;
   message: string;
   timestamp: number; // use Date.now() when storing
+  _id?: mongoose.Types.ObjectId;
+  repliedTo?: mongoose.Types.ObjectId;
+  isRead?: boolean;
 }
 
 export interface IChatPool extends Document {
@@ -14,11 +18,19 @@ export interface IChatPool extends Document {
   messages: IChatMessage[];
 }
 
+export type ContactWithPreview = {
+  contact: IPassUser;
+  recentMessages?: IChatMessage[]; // only present for top‑5 contacts
+};
+
 const ChatMessageSchema = new Schema<IChatMessage>({
   from: { type: String, required: true },
   to: { type: String, required: true },
   message: { type: String, required: true },
   timestamp: { type: Number, required: true },
+  _id: { type: mongoose.Types.ObjectId },
+  repliedTo: { type: mongoose.Types.ObjectId },
+  isRead: { type: Boolean, default: false }
 });
 
 const ChatPoolSchema = new Schema<IChatPool>({
