@@ -19,16 +19,6 @@ class ChatsController extends GetxController {
     fetchRecentChatsList();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
   fetchRecentChatsList() {
     MainController.service.addListener((data) {
       final parsedData = jsonDecode(data);
@@ -62,24 +52,31 @@ class ChatsController extends GetxController {
   }
 
   fetchContacts() async {
-    contacts.value = await MainController.storageService.readContacts();
+    isReady.value = false;
+
+    contacts.assignAll(await MainController.storageService.readContacts());
+
     Map<String, PersonalChat> personalChats = {};
     final allChats = await MainController.storageService.readAllPersonalChats();
+
+    final List<ContactWithPreview> newRecentChatsList = [];
+
     for (var contact in contacts) {
       final chat = allChats.firstWhereOrNull(
         (chat) => chat.contactId == contact.userId,
       );
+
       if (chat != null) {
-        personalChats.addAll({contact.userId: chat});
-        recentChatsList.add(
+        personalChats[contact.userId] = chat;
+        newRecentChatsList.add(
           ContactWithPreview(contact: contact, recentMessages: chat.messages),
         );
       } else {
-        recentChatsList.add(ContactWithPreview(contact: contact));
+        newRecentChatsList.add(ContactWithPreview(contact: contact));
       }
     }
 
-    recentChatsList.sort((user1, user2) {
+    newRecentChatsList.sort((user1, user2) {
       final user1Chat = personalChats[user1.contact.userId];
       final user2Chat = personalChats[user2.contact.userId];
 
@@ -97,12 +94,13 @@ class ChatsController extends GetxController {
       if (!user1HasMessages) return 1;
       if (!user2HasMessages) return -1;
 
-      // Now both have messages
       final user1Time = user1Messages.last.timestamp;
       final user2Time = user2Messages.last.timestamp;
 
       return user2Time.compareTo(user1Time);
     });
+
+    recentChatsList.assignAll(newRecentChatsList);
 
     isReady.value = true;
   }

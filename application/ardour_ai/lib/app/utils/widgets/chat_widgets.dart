@@ -97,6 +97,8 @@ class ReplyPreviewCard extends StatelessWidget {
   final double overallPadding;
   final Color backgroundColor;
   final Color foregroundColor;
+  final Color barColor;
+  final Color textColor;
 
   const ReplyPreviewCard({
     super.key,
@@ -106,6 +108,8 @@ class ReplyPreviewCard extends StatelessWidget {
     this.overallPadding = 5,
     this.backgroundColor = Colors.white,
     this.foregroundColor = const Color(0xFFE5E7EB),
+    this.barColor = const Color(0xFF574CD6),
+    this.textColor = Colors.black,
   }) : assert(
          repliedTo != null || repliedToRx != null,
          'Either repliedTo or repliedToRx must be provided.',
@@ -127,56 +131,68 @@ class ReplyPreviewCard extends StatelessWidget {
 
   Widget _buildCard(ChatMessage reply, bool isReactive) {
     return FTContainer(
-        child: Container(
+        child: SizedBox(
           width: MainController.size.width,
-          decoration: BoxDecoration(
-            color: foregroundColor,
-            borderRadius: BorderRadius.circular(10),
-          ),
           child: Stack(
+            clipBehavior: Clip.none,
             children: [
-              FTContainer(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        reply.senderName,
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: AppColors.statusBorder,
-                          fontWeight: FontWeight.bold,
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      width: 5,
+                      decoration: BoxDecoration(
+                        color: barColor,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          bottomLeft: Radius.circular(10),
                         ),
                       ),
-                      Text(
-                        reply.message,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: true,
-                        maxLines: 4,
-                        style: GoogleFonts.poppins(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                )
-                ..pl = 15
-                ..py = 8
-                ..pr = 20,
-
-              const Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0, // ← pins bottom, so height = full card height
-                child: SizedBox(
-                  width: 5,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppColors.statusBorder,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        bottomLeft: Radius.circular(10),
-                      ),
                     ),
-                  ),
+
+                    Expanded(
+                      child:
+                          FTContainer(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    reply.senderName,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      color: barColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    reply.message,
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: true,
+                                    maxLines: 4,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      color: textColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                            ..pl = 10
+                            ..py = 8
+                            ..pr = 20
+                            ..alignment = Alignment.centerLeft
+                            ..boxDecoration = BoxDecoration(
+                              color: foregroundColor,
+                              borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(10),
+                                bottomRight: Radius.circular(10),
+                              ),
+                            ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -205,6 +221,8 @@ class ReplyPreviewCard extends StatelessWidget {
       )
       ..p = overallPadding
       ..pb = bottomPadding
+      ..pt = overallPadding + 2
+      ..pl = overallPadding + 1
       ..bgColor = backgroundColor
       ..borderRadius = const BorderRadius.only(
         bottomLeft: Radius.circular(25),
@@ -834,6 +852,8 @@ class RecieverRepliedChat extends StatelessWidget {
                             repliedTo: repliedMessage,
                             bottomPadding: 5,
                             overallPadding: 3,
+                            barColor: Color.fromARGB(255, 217, 231, 22),
+                            textColor: Colors.white,
                             backgroundColor: const Color(0xff766aec),
                             foregroundColor: const Color.fromARGB(
                               255,
@@ -888,7 +908,7 @@ class RecieverRepliedChat extends StatelessWidget {
                     ..borderRadius = BorderRadius.only(
                       bottomLeft: borderRadius,
                       bottomRight: borderRadius,
-                      topLeft: borderRadius,
+                      topRight: borderRadius,
                     )
                     ..pt = 1
                     ..constraints = BoxConstraints(
