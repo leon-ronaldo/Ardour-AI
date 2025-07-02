@@ -1,8 +1,10 @@
 // ignore_for_file: avoid_print, curly_braces_in_flow_control_structures
 
+import 'dart:async';
 import 'dart:convert';
 import 'package:ardour_ai/app/data/storage_service.dart';
 import 'package:ardour_ai/app/data/websocket_models.dart';
+import 'package:ardour_ai/app/data/websocket_service.dart';
 import 'package:ardour_ai/app/routes/app_pages.dart';
 import 'package:ardour_ai/app/utils/widgets/snackbar.dart';
 import 'package:ardour_ai/main.dart';
@@ -26,20 +28,19 @@ class HomeController extends GetxController {
       return false;
     } else {
       try {
-        await MainController.service.connect(
-          token: token,
-          serverCloseListener: listenClose,
-        );
+        await MainController.service
+            .connect(token: token, serverCloseListener: listenClose)
+            .timeout(Duration(seconds: 8));
 
         MainController.service.addListener(listenData);
 
         getInitialData();
-
-        isReady.value = true;
         return true;
-      } on Exception catch (e) {
+      } on TimeoutException catch (_) {
         noServerError();
         return false;
+      } finally {
+        isReady.value = true;
       }
     }
   }

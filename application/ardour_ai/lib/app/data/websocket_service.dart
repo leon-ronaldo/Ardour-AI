@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:ardour_ai/app/data/websocket_models.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -22,6 +23,23 @@ class WebSocketService {
   bool get isConnected => _channel != null && _channel!.closeCode == null;
 
   Stream<dynamic> get stream => _controller.stream;
+
+  Future<bool> safeCheck() async {
+    if (_channel != null) {
+      try {
+        await _channel?.ready;
+        return true;
+      } on SocketException catch (_) {
+        print("athu ready agala paaa");
+        return false;
+      } on WebSocketChannelException catch (_) {
+        print("athu ready agala paaa");
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 
   Future<void> connect({
     String? url,
@@ -45,22 +63,17 @@ class WebSocketService {
       cancelOnError: true,
     );
 
-    try {
-      await _channel!.ready;
-    } on Exception {
-      throw WSServiceNotInitializedError();
-    }
+    await safeCheck();
   }
 
-  void addListener(void Function(dynamic data) onData) {
-    stream.listen(onData); // Multiple listeners allowed
+  Future<void> addListener(void Function(dynamic data) onData) async {
+    if (await safeCheck()) stream.listen(onData); 
   }
 
-  void send(WSBaseRequest data) {
-    if (_channel != null)
+  Future<void> send(WSBaseRequest data) async {
+    if (await safeCheck()) {
       _channel!.sink.add(jsonEncode(data));
-    else
-      throw WSServiceNotInitializedError();
+    }
   }
 
   Future<void> close() async {

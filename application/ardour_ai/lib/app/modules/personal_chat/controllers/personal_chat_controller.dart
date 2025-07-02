@@ -89,7 +89,14 @@ class PersonalChatController extends GetxController {
     fetchMessages();
   }
 
-  void fetchMessages() {
+  Future<void> fetchMessages() async {
+    final offlineMessages = await MainController.storageService
+        .readPersonalChat(contact.userId);
+
+    if (offlineMessages != null) {
+      chats.value = offlineMessages.messages;
+    }
+
     MainController.service.send(
       WSBaseRequest(
         type: WSModuleType.Account,
@@ -203,15 +210,6 @@ class PersonalChatController extends GetxController {
           (item) => ChatMessage.fromJson(item),
         ),
       ];
-
-      chats.add(
-        ChatMessage(
-          from: contact.userId,
-          to: "684b0ab50e2c9ca1d99925c0",
-          message: "Funny LOL",
-          timestamp: DateTime.now().millisecondsSinceEpoch,
-        )..repliedTo = "6862b528a861f8be5ec931dd",
-      );
 
       sortChats();
       scrollToBottomSafely();
