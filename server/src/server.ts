@@ -1,51 +1,47 @@
 import express from "express";
 import http from "http";
 import WebSocket from "ws";
-import WebSocketResponder from "./utils/WSResponder";
-import { ErrorCodes, SuccessCodes } from "./utils/responseCodes";
-import User, { IUser } from "./models/User";
-import path from "path";
+
+import dotenv from "dotenv";
+dotenv.config();
+
 import AppRouter from "./routes/router";
-import clientManager from "./utils/clientManager";
-import dotenv from 'dotenv'
-import { authenticateJWT } from "./middleware/authMiddleware";
 import connectDb from "./config/dbConnection";
 import authenticateUser from "./controllers/AuthenticationController";
-
-const PORT = 8055
+import clientManager from "./utils/clientManager";
 
 const app = express();
-dotenv.config()
-// const server = http.createServer(app);
-const wss = new WebSocket.Server({ port: 8055 });
+connectDb();
 
-connectDb()
+// ---------- KEY CHANGE: use Render's assigned port ----------
+const PORT = Number(process.env.PORT || 3000);      // Render sets PORT env var
 
-const handleConnection = async (ws: WebSocket, req: http.IncomingMessage) => {
+// Create ONE HTTP server that Express & WS share
+const server = http.createServer(app);
 
-  const { success, responseHandler, uId } = await authenticateUser(ws, req)
+// Attach ws to that server (no hard‑coded port)
+const wss = new WebSocket.Server({ server });
 
-  if (!success || !responseHandler) {
-    return
-  }
+// ---------- WebSocket connection ----------
+wss.on("connection", async (ws, req) => {
+  const { success, responseHandler, uId } = await authenticateUser(ws, req);
+  if (!success || !responseHandler) return;
 
-  ws.on("message", (message: string) => AppRouter(message, responseHandler))
+  ws.on("message", (msg: string) => AppRouter(msg, responseHandler));
+
   ws.on("close", (code, reason) => {
     clientManager.removeClient(uId!);
-    console.log(`User ${uId} left the pool\ncode: ${code}\nreason: ${reason}`)
-  })
-};
+    console.log(`User ${uId} disconnected – code ${code} reason ${reason}`);
+  });
+});
 
-wss.on("connection", handleConnection);
+// ---------- optional: simple health check for Render ----------
+// app.get("/", (_req, res) => res.status(200).send("Ardour‑AI WS server OK"));
 
-export default wss
+// ---------- start listening ----------
+server.listen(PORT, () => {
+  console.log(`🟢  WebSocket server running on port ${PORT}`);
+  console.log(`    ➜  wss://ardour-ai.onrender.com`);
+});
 
-console.log(`server running on ws://localhost:${PORT}`)
-
-// app.get("/", (req, res) => {
-//     res.sendFile(path.join(process.cwd(), 'index.html'));
-// })
-
-// app.listen(PORT, () => {
-//     console.log(`Server listening on http://localhost:${PORT}`);
-// })
+export default wss;
