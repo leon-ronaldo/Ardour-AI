@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import UserModel, { IUser } from "../models/User";
 import { generateAccessToken } from "../middleware/authMiddleware";
 
-const MONGO_URI = "mongodb://localhost:27017/Ardour-AI";
+const MONGO_URI = "mongodb+srv://Ronaldo029:Ronaldo029%40MongoDB@cluster0.7lvsjco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0/Ardour-AI";
 
 const rawUsers = [
   { username: "manish_brainwave", firstName: "Manish", lastName: "Prasad", email: "manish.prasad@example.com" },
