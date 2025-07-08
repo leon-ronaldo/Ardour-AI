@@ -4,7 +4,9 @@
   "main": "server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.ts"
+    "dev": "nodemon ./src/server.ts",
+    "start": "node ./dist/server.js",
+    "build": "tsc"
   },
   "author": "leon ronaldo s",
   "license": "ISC",

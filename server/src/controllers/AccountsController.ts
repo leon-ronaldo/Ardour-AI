@@ -302,10 +302,28 @@ export async function getRecentChatsList(responseHandler: WebSocketResponder) {
 
     const contacts = user.contacts.map((id) => id.toString());
 
+    let response: WSAccountResponse = {
+        type: "Account",
+        resType: "RECENT_CHATS_LIST",
+        data: {
+            recentChats: [],
+        },
+    };
+
+    if (contacts.length === 0) {
+        responseHandler.sendData(response);
+        return;
+    }
+
     // Load all ChatPools involving this user
     const chatPools: IChatPool[] = await ChatPool.find({
         participants: userIdStr,
     }).lean();
+
+    if (chatPools.length === 0) {
+        responseHandler.sendData(response);
+        return;
+    }
 
     // Build a map for quick lookup
     const chatMap = new Map<string, IChatPool>();
@@ -352,13 +370,7 @@ export async function getRecentChatsList(responseHandler: WebSocketResponder) {
         return bLast - aLast;
     });
 
-    const response: WSAccountResponse = {
-        type: "Account",
-        resType: "RECENT_CHATS_LIST",
-        data: {
-            recentChats: result,
-        },
-    };
+    response.data.recentChats = result;
 
     responseHandler.sendData(response);
 }
