@@ -62,8 +62,8 @@ class AddFriendsView extends GetView<AddFriendsController> {
                                         ? Duration(milliseconds: 150 * index)
                                         : null,
                                 child: ProfileFollowRequestCard(
-                                  // followers: profile.followers,
-                                  // following: profile.following,
+                                  followers: profile.followersStr,
+                                  following: profile.followingStr,
                                   // handle: profile.handleName,
                                   userId: profile.userId,
                                   name: profile.userName,

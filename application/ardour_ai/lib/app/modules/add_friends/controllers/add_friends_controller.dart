@@ -23,30 +23,6 @@ class AddFriendsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
-    // Future.delayed(const Duration(seconds: 8), () {
-    //   searchListRecommendations.value = [
-    //     "_json_statham_**",
-    //     "_arnd_swsnigger_12_45_",
-    //   ];
-    //   print("naa nan update panniten");
-    // });
-
-    // Future.delayed(const Duration(seconds: 12), () {
-    //   searchListRecommendations.value = [
-    //     "_json_wick_404_",
-    //     "_binary_potter_7x_",
-    //     "_neo_matrix_09__",
-    //     "_arnd_termintr_808_",
-    //     "_c0der_strange_1_",
-    //     "_sudo_batman_1999_",
-    //     "_algo_shelby_v1__",
-    //     "_floyd_ping_007_",
-    //     "_optic_thor_313_",
-    //     "_gh0st_holmes_xx_",
-    //   ];
-    //   print("marupidiyum update panniten");
-    // });
     _debouncer = Debouncer(duration: Durations.extralong4);
     initialize();
   }

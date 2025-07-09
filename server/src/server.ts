@@ -14,7 +14,7 @@ const app = express();
 connectDb();
 
 // ---------- KEY CHANGE: use Render's assigned port ----------
-const PORT = Number(process.env.PORT || 3000);      // Render sets PORT env var
+const PORT = Number(process.env.PORT || 8055);      // Render sets PORT env var
 
 // Create ONE HTTP server that Express & WS share
 const server = http.createServer(app);

@@ -14,7 +14,7 @@ async function getContacts(responseHandler: WebSocketResponder) {
     const contacts: IPassUser[] = (
         await UserModel.find({ _id: { $in: contactIds } })
     ).map(user => ({
-        userId: user._id.toString(), userName: user.username, profileImage: user.image
+        userId: user._id.toString(), userName: user.username, profileImage: user.image, followers: user.followers, following: user.following
     }))
 
     const data: WSAccountResponse = {
@@ -220,11 +220,16 @@ async function makeFriendRequest(responseHandler: WebSocketResponder, message: W
 
     try {
         if (!user.friendRequests.includes(responseHandler.user!._id)) {
+            user.followers++;
+            responseHandler.user!.following++;
+            await responseHandler.user!.save();
+
             user.friendRequests.push(responseHandler.user!._id);
             user.notifications.accountReqNotifications.push({
                 userId: responseHandler.user!._id.toString(),
                 timeStamp: Date.now()
             })
+
             await user.save();
         }
 
@@ -273,9 +278,17 @@ async function acceptFriendRequest(responseHandler: WebSocketResponder, message:
                 accountReqNotifications.
                 filter((notification) => notification.userId !== theOneWhoIsBeingAccepted!._id.toString());
 
+
         // add account id as friends list
-        insertWithoutDuplicate(theOneWhoAccepts.contacts, theOneWhoIsBeingAccepted._id);
-        insertWithoutDuplicate(theOneWhoIsBeingAccepted.contacts, theOneWhoAccepts._id);
+        if (!theOneWhoAccepts.contacts.includes(theOneWhoIsBeingAccepted._id)) {
+            theOneWhoAccepts.contacts.push(theOneWhoIsBeingAccepted._id)
+            theOneWhoAccepts.following++;
+        }
+
+        if (!theOneWhoIsBeingAccepted.contacts.includes(theOneWhoAccepts._id)) {
+            theOneWhoIsBeingAccepted.contacts.push(theOneWhoAccepts._id)
+            theOneWhoIsBeingAccepted.followers++;
+        }
 
         await theOneWhoAccepts.save();
         await theOneWhoIsBeingAccepted.save();
@@ -348,6 +361,8 @@ export async function getRecentChatsList(responseHandler: WebSocketResponder) {
             userName: contactUser.username,
             userId: contactId,
             profileImage: contactUser.image,
+            followers: contactUser.followers,
+            following: contactUser.following
         };
 
         const chat = chatMap.get(contactId);

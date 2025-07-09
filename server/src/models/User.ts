@@ -3,7 +3,9 @@ import mongoose, { Document } from "mongoose";
 export interface IPassUser {
   userName: string,
   userId: string,
-  profileImage?: string
+  profileImage?: string,
+  followers?: number,
+  following?: number
 }
 
 export interface PostNotification {
@@ -41,6 +43,8 @@ export interface IUser extends Document {
   notifications: IUserNotification;
   createdOn: Date;
   FCMtoken?: string;
+  followers: number;
+  following: number;
 }
 
 const UserSchema = new mongoose.Schema<IUser>({
@@ -76,6 +80,8 @@ const UserSchema = new mongoose.Schema<IUser>({
     },
     default: () => ({ postNotifications: [], accountReqNotifications: [] }),
   },
+  followers: { type: Number },
+  following: { type: Number },
   createdOn: { type: Date, default: Date.now }
 });
 

@@ -7,12 +7,10 @@ import 'dart:io';
 import 'package:ardour_ai/app/data/websocket_models.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-final String baseURI = "wss://ardour-ai.onrender.com";
+// final String baseURI = "wss://ardour-ai.onrender.com";
+final String baseURI = "ws://10.0.2.2:8055";
 String serverURL(token) => "$baseURI/?token=$token";
 final String authenticationURL = "$baseURI/authenticate";
-// const String token =
-//     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODQxMzMwMmVkOTQxMmVjNWMwYWYzNjYiLCJlbWFpbCI6ImphbmUuc21pdGhAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDkyMjQ0OTQsImV4cCI6MTc0OTMxMDg5NH0.QFN9l8zyNM2cRwSHHKRA4BbWscXMJ_u0PhUK54z0AOw";
-// jane
 
 class WSServiceNotInitializedError extends Error {}
 

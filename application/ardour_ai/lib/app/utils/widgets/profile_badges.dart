@@ -274,14 +274,14 @@ class ProfileFollowRequestCard extends StatefulWidget {
     required this.name,
     required this.image,
     required this.userId,
-    this.handle = "_jxhn_wxck*",
+    this.handle,
     this.followers = "897",
     this.following = "640",
   });
 
   final String name;
   final String image;
-  final String handle;
+  final String? handle;
   final String userId;
   final String following;
   final String followers;
@@ -486,18 +486,19 @@ class _ProfileFollowRequestCardState extends State<ProfileFollowRequestCard>
                   ),
                 ),
                 const SizedBox(height: 4),
-                animatedItem(
-                  opacity: _handleOpacity,
-                  position: _handlePosition,
-                  child: Text(
-                    widget.handle,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white70,
-                      fontSize: 10,
+                if (widget.handle != null)
+                  animatedItem(
+                    opacity: _handleOpacity,
+                    position: _handlePosition,
+                    child: Text(
+                      widget.handle!,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        color: Colors.white70,
+                        fontSize: 10,
+                      ),
                     ),
                   ),
-                ),
                 const SizedBox(height: 16),
                 animatedItem(
                   opacity: _statsOpacity,

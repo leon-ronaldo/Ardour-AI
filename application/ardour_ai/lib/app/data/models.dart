@@ -8,11 +8,33 @@ class PassUser {
   final String userName;
   final String userId;
   final String? profileImage;
+  final int? followers;
+  final int? following;
 
-  PassUser({required this.userId, required this.userName, this.profileImage});
+  PassUser({
+    required this.userId,
+    required this.userName,
+    this.profileImage,
+    this.followers,
+    this.following,
+  });
+
+  String get followersStr => _formatCount(followers);
+  String get followingStr => _formatCount(following);
+
+  String _formatCount(int? count) {
+    if (count == null) return "0";
+    if (count >= 1000000000) {
+      return "${(count / 1000000000).toStringAsFixed(count % 1000000000 >= 100000000 ? 1 : 0)}B";
+    } else if (count >= 1000000) {
+      return "${(count / 1000000).toStringAsFixed(count % 1000000 >= 100000 ? 1 : 0)}M";
+    } else if (count >= 1000) {
+      return "${(count / 1000).toStringAsFixed(count % 1000 >= 100 ? 1 : 0)}k";
+    }
+    return count.toString();
+  }
 
   factory PassUser.fromJSON(data) {
-    print("The data that is being decoded $data");
     if (data['userId'] == null || data['userName'] == null) {
       throw InvalidPassUserParameters();
     }
@@ -20,6 +42,8 @@ class PassUser {
       userId: data['userId']!,
       userName: data['userName']!,
       profileImage: data['profileImage'],
+      followers: data['followers'],
+      following: data['following'],
     );
   }
 
@@ -28,6 +52,8 @@ class PassUser {
       userId: userId,
       userName: userName,
       profileImage: profileImage,
+      followers: followers,
+      following: following,
     });
   }
 
@@ -35,6 +61,8 @@ class PassUser {
     "userId": userId,
     "userName": userName,
     "profileImage": profileImage,
+    "followers": followers,
+    "following": following,
   };
 }
 
@@ -135,7 +163,7 @@ class ChatMessage {
     this.isLiveMessage = false,
     this.isRead = false,
     this.repliedTo,
-    this.id
+    this.id,
   });
 
   /// Factory to create from JSON
@@ -149,7 +177,7 @@ class ChatMessage {
       isRead: json['isRead'] ?? false,
       isLiveMessage: json['isLiveMessage'] ?? false,
       repliedTo: json['repliedTo'],
-      id: json['_id']
+      id: json['_id'],
     );
   }
 

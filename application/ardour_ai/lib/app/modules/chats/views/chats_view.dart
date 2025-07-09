@@ -121,41 +121,78 @@ class ChatsView extends GetView<ChatsController> {
                           ..mb = 15,
 
                         controller.isReady.value
-                            ? Column(
-                              children:
-                                  controller.recentChatsList.map((account) {
-                                    final chat = account.recentMessages;
-                                    String caption =
-                                        "Messages are end-to-end encrypted";
-                                    int? timestamp;
-                                    if (chat != null) {
-                                      if (chat.isNotEmpty) {
-                                        caption =
-                                            "${chat.last.from == account.contact.userId ? "" : "You: "}${chat.last.message}";
-                                        timestamp = chat.last.timestamp;
-                                      }
-                                    }
-                                    return InkResponse(
-                                      onTap: () {
-                                        Get.toNamed(
-                                          Routes.PERSONAL_CHAT,
-                                          arguments: {
-                                            'contact': account.contact,
+                            ? controller.recentChatsList.isEmpty
+                                ? Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(24.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.group_outlined,
+                                          size: 80,
+                                          color: Colors.grey[400],
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Text(
+                                          "No contacts found",
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.headlineSmall?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.grey[700],
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          "Start by adding some friends to begin chatting and sharing moments!",
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium?.copyWith(
+                                            color: Colors.grey[600],
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                                : Column(
+                                  children:
+                                      controller.recentChatsList.map((account) {
+                                        final chat = account.recentMessages;
+                                        String caption =
+                                            "Messages are end-to-end encrypted";
+                                        int? timestamp;
+                                        if (chat != null) {
+                                          if (chat.isNotEmpty) {
+                                            caption =
+                                                "${chat.last.from == account.contact.userId ? "" : "You: "}${chat.last.message}";
+                                            timestamp = chat.last.timestamp;
+                                          }
+                                        }
+                                        return InkResponse(
+                                          onTap: () {
+                                            Get.toNamed(
+                                              Routes.PERSONAL_CHAT,
+                                              arguments: {
+                                                'contact': account.contact,
+                                              },
+                                            );
                                           },
+                                          child: ChatCard(
+                                            name: account.contact.userName,
+                                            image:
+                                                account.contact.profileImage ??
+                                                "assets/images/sample/raul.jpg",
+                                            unreadMessages: null,
+                                            caption: caption,
+                                            timeStamp: timestamp,
+                                          ),
                                         );
-                                      },
-                                      child: ChatCard(
-                                        name: account.contact.userName,
-                                        image:
-                                            account.contact.profileImage ??
-                                            "assets/images/sample/raul.jpg",
-                                        unreadMessages: null,
-                                        caption: caption,
-                                        timeStamp: timestamp,
-                                      ),
-                                    );
-                                  }).toList(),
-                            )
+                                      }).toList(),
+                                )
                             : PlaceHolderLoader(),
 
                         SizedBox(height: 20),

@@ -75,16 +75,20 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
 
                 // if trying to login with google
                 else {
+
+                    // new user
                     if (!user) {
                         const newUser = new User({
                             username: req.data.userName ?? req.data.email,
                             firstName: req.data.userName!.split(" ")[0],
                             lastName: req.data.userName!.split(" ").slice(1).join(" "),
                             email: req.data.email,
-                            imageURL: req.data.profileImage,
+                            imageURL: req.data.profileImage ?? "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
                             contacts: [],
                             friendRequests: [],
-                            FCMtoken: req.data.FCMtoken
+                            FCMtoken: req.data.FCMtoken,
+                            followers: "0",
+                            following: "0"
                         });
 
                         user = await newUser.save();
@@ -92,7 +96,10 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
                             responseHandler.closeClient(ErrorCodes.INTERNAL_SERVER_ERROR);
                             return resolve(failedCase);
                         }
-                    } else {
+                    }
+
+                    // existing user
+                    else {
                         user.FCMtoken = req.data.FCMtoken;
 
                         user = await user.save();

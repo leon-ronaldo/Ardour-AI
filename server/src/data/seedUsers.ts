@@ -3,29 +3,29 @@ import mongoose from "mongoose";
 import UserModel, { IUser } from "../models/User";
 import { generateAccessToken } from "../middleware/authMiddleware";
 
-const MONGO_URI = "mongodb+srv://Ronaldo029:Ronaldo029%40MongoDB@cluster0.7lvsjco.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0/Ardour-AI";
+const MONGO_URI = "mongodb://localhost:27017/Ardour-AI";
 
 const rawUsers = [
-  { username: "manish_brainwave", firstName: "Manish", lastName: "Prasad", email: "manish.prasad@example.com" },
-  { username: "soorya_mix", firstName: "Sooryodhaya", lastName: "", email: "soorya@example.com" },
-  { username: "baba_yaga", firstName: "John", lastName: "Wick", email: "john.wick@example.com" },
-  { username: "gothams_richest", firstName: "Ben", lastName: "Affleck", email: "ben.affleck@example.com" },
-  { username: "lucia_legend", firstName: "Lucia", lastName: "Caminos", email: "lucia.caminos@example.com" },
-  { username: "ashlyn_daily", firstName: "Ashlyn", lastName: "Mary", email: "ashlyn.mary@example.com" },
-  { username: "mike_ls", firstName: "Michael", lastName: "De Santa", email: "michael.desanta@example.com" },
-  { username: "sam_frost", firstName: "Samantha", lastName: "Gallen", email: "samantha.gallen@example.com" },
-  { username: "vaas_loop", firstName: "Vaas", lastName: "Montenegro", email: "vaas.m@example.com" },
-  { username: "captain_kenway", firstName: "Edward", lastName: "Kenway", email: "edward.kenway@example.com" },
-  { username: "faith_bliss", firstName: "Faith", lastName: "Seed", email: "faith.seed@example.com" },
-  { username: "ezio_firenze", firstName: "Ezio", lastName: "Auditore", email: "ezio.auditore@example.com" },
+  { username: "manish_brainwave", firstName: "Manish", lastName: "Prasad", email: "manish.prasad@example.com", followers: 0, following: 0 },
+  { username: "soorya_mix", firstName: "Sooryodhaya", lastName: "", email: "soorya@example.com", followers: 0, following: 0 },
+  { username: "baba_yaga", firstName: "John", lastName: "Wick", email: "john.wick@example.com", followers: 0, following: 0 },
+  { username: "gothams_richest", firstName: "Ben", lastName: "Affleck", email: "ben.affleck@example.com", followers: 0, following: 0 },
+  { username: "lucia_legend", firstName: "Lucia", lastName: "Caminos", email: "lucia.caminos@example.com", followers: 0, following: 0 },
+  { username: "ashlyn_daily", firstName: "Ashlyn", lastName: "Mary", email: "ashlyn.mary@example.com", followers: 0, following: 0 },
+  { username: "mike_ls", firstName: "Michael", lastName: "De Santa", email: "michael.desanta@example.com", followers: 0, following: 0 },
+  { username: "sam_frost", firstName: "Samantha", lastName: "Gallen", email: "samantha.gallen@example.com", followers: 0, following: 0 },
+  { username: "vaas_loop", firstName: "Vaas", lastName: "Montenegro", email: "vaas.m@example.com", followers: 0, following: 0 },
+  { username: "captain_kenway", firstName: "Edward", lastName: "Kenway", email: "edward.kenway@example.com", followers: 0, following: 0 },
+  { username: "faith_bliss", firstName: "Faith", lastName: "Seed", email: "faith.seed@example.com", followers: 0, following: 0 },
+  { username: "ezio_firenze", firstName: "Ezio", lastName: "Auditore", email: "ezio.auditore@example.com", followers: 0, following: 0 },
 
   // original 6 users
-  { username: "john_doe", firstName: "John", lastName: "Doe", email: "john.doe@example.com", },
-  { username: "jane_smith", firstName: "Jane", lastName: "Smith", email: "jane.smith@example.com", },
-  { username: "robert_lee", firstName: "Robert", lastName: "Lee", email: "robert.lee@example.com", },
-  { username: "alice_wang", firstName: "Alice", lastName: "Wang", email: "alice.wang@example.com", },
-  { username: "michael_kim", firstName: "Michael", lastName: "Kim", email: "michael.kim@example.com", },
-  { username: "lisa_chen", firstName: "Lisa", lastName: "Chen", email: "lisa.chen@example.com", },
+  { username: "john_doe", firstName: "John", lastName: "Doe", email: "john.doe@example.com", followers: 0, following: 0 },
+  { username: "jane_smith", firstName: "Jane", lastName: "Smith", email: "jane.smith@example.com", followers: 0, following: 0 },
+  { username: "robert_lee", firstName: "Robert", lastName: "Lee", email: "robert.lee@example.com", followers: 0, following: 0 },
+  { username: "alice_wang", firstName: "Alice", lastName: "Wang", email: "alice.wang@example.com", followers: 0, following: 0 },
+  { username: "michael_kim", firstName: "Michael", lastName: "Kim", email: "michael.kim@example.com", followers: 0, following: 0 },
+  { username: "lisa_chen", firstName: "Lisa", lastName: "Chen", email: "lisa.chen@example.com", followers: 0, following: 0 },
 ];
 
 const contactMap: Record<string, string[]> = {
@@ -52,6 +52,24 @@ const contactMap: Record<string, string[]> = {
   "ezio_firenze": ["captain_kenway", "baba_yaga"],
 };
 
+const userMap = Object.fromEntries(rawUsers.map(user => [user.username, user]));
+
+// Step 2: Iterate through the contactMap to update following and followers
+for (const [username, followingList] of Object.entries(contactMap)) {
+  const user = userMap[username];
+  if (!user) continue;
+
+  // Update the user's following count
+  user.following = followingList.length;
+
+  // Update the followers of each followed user
+  for (const followedUsername of followingList) {
+    const followedUser = userMap[followedUsername];
+    if (followedUser) {
+      followedUser.followers += 1;
+    }
+  }
+}
 
 const seedUsers = async () => {
   try {
