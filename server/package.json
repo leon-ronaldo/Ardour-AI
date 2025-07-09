@@ -1,32 +1,30 @@
 {
-  "name": "server",
+  "name": "chat-app",
   "version": "1.0.0",
-  "description": "",
   "main": "server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.ts"
+    "dev": "nodemon ./src/server.ts",
+    "start": "node ./dist/server.js",
+    "build": "tsc"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/leon-ronaldo/Ardour-AI.git"
-  },
-  "author": "Leon Ronaldo S",
+  "author": "leon ronaldo s",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/leon-ronaldo/Ardour-AI/issues"
-  },
-  "homepage": "https://github.com/leon-ronaldo/Ardour-AI#readme",
+  "description": "",
   "dependencies": {
-    "@types/express": "^5.0.1",
+    "@types/dotenv": "^8.2.3",
+    "@types/express": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.9",
-    "bcryptjs": "^3.0.2",
-    "express": "^4.21.2",
+    "@types/ws": "^8.18.1",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
     "express-async-handler": "^1.2.0",
-    "mongoose": "^8.13.1",
-    "nodemon": "^3.1.9",
-    "server": "file:",
+    "firebase-admin": "^13.4.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.15.1",
+    "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3",
+    "ws": "^8.18.2"
   }
 }

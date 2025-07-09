@@ -1,0 +1,20 @@
+const ErrorCodes = {
+    INVALID_TOKEN: 4003,
+    TOKEN_NOT_PROVIDED: 4002,
+    EXPIRED_TOKEN: 4001,
+    USER_NOT_FOUND: 4004,
+    UNKNOWN_ACTION_TYPE: 4005,
+    INTERNAL_SERVER_ERROR: 500,
+    GROUP_NOT_FOUND: 4006,
+    INVALID_CREDENTIALS: 4007,
+};
+
+const SuccessCodes = {
+    CONNECTION_SUCCESSFUL: 2000,
+    AWAITING_CREDENTIALS: 2001,
+};
+
+export {
+    ErrorCodes,
+    SuccessCodes
+};

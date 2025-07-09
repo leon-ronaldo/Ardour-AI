@@ -8,7 +8,7 @@
 PRODUCT_NAME = ardour_ai
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.Dadcode.ardour.ai.ardourAi
+PRODUCT_BUNDLE_IDENTIFIER = com.wallOfHalo.ardourAi
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2025 com.Dadcode.ardour.ai. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2025 com.wallOfHalo. All rights reserved.

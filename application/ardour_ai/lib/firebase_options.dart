@@ -54,7 +54,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBF8L8t9GHrc8gdF8tgNwmZa5Z79zZdVqI',
-    appId: '1:933102373369:android:393ef20a0ee4dc68bc9528',
+    appId: '1:933102373369:android:bb01215bfeaa1a26bc9528',
     messagingSenderId: '933102373369',
     projectId: 'ardour-ai',
     storageBucket: 'ardour-ai.firebasestorage.app',

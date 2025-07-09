@@ -4,13 +4,19 @@ part of 'app_pages.dart';
 abstract class Routes {
   Routes._();
   static const HOME = _Paths.HOME;
-  static const CHAT_PAGE = _Paths.CHAT_PAGE;
-  static const GET_STARTED = _Paths.GET_STARTED;
+  static const CHATS = _Paths.CHATS;
+  static const PERSONAL_CHAT = _Paths.PERSONAL_CHAT;
+  static const AUTHENTICATION = _Paths.AUTHENTICATION;
+  static const ADD_FRIENDS = _Paths.ADD_FRIENDS;
+  static const NOTIFICATIONS = _Paths.NOTIFICATIONS;
 }
 
 abstract class _Paths {
   _Paths._();
   static const HOME = '/home';
-  static const CHAT_PAGE = '/chat-page';
-  static const GET_STARTED = '/get-started';
+  static const CHATS = '/chats';
+  static const PERSONAL_CHAT = '/personal-chat';
+  static const AUTHENTICATION = '/authentication';
+  static const ADD_FRIENDS = '/add-friends';
+  static const NOTIFICATIONS = '/notifications';
 }

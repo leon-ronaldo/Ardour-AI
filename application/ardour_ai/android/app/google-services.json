@@ -7,17 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:933102373369:android:393ef20a0ee4dc68bc9528",
+        "mobilesdk_app_id": "1:933102373369:android:bb01215bfeaa1a26bc9528",
         "android_client_info": {
-          "package_name": "com.Dadcode.ardour.ai.ardour_ai"
+          "package_name": "com.wallOfHalo.ardour_ai"
         }
       },
       "oauth_client": [
         {
-          "client_id": "933102373369-ihggmghhpsa59igmfqcqruo6gk1j4bl6.apps.googleusercontent.com",
+          "client_id": "933102373369-h90h6seefibe943mhjlp28b2tfi01uve.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.Dadcode.ardour.ai.ardour_ai",
+            "package_name": "com.wallOfHalo.ardour_ai",
             "certificate_hash": "bc5704c6f9ddbf3b06c683ecf579e61010a1257f"
           }
         },
