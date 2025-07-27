@@ -1,5 +1,5 @@
 import admin from 'firebase-admin';
-import serviceAccount from './serviceAccountCert.json';
+import serviceAccount from '../../../../serviceAccountCert.json';
 import UserModel, { IUser } from '../models/User';
 
 // Initialize Firebase Admin SDK
