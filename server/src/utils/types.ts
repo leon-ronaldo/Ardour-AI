@@ -143,9 +143,9 @@ export type WSChatResponse =
 
 // AUTHENTICATION MODULE
 export type WSAuthentiacationResponse =
-  WSBaseResponse<"Authentication", "AUTH_TOKENS", { accessToken: string, refreshToken: string, userId: string, profileImage?: string }>
-  | WSBaseResponse<"Authentication", "ACCESS_TOKEN", { accessToken: string, userId: string, profileImage?: string }>
-  | WSBaseResponse<"Authentication", "REFRESH_TOKEN", { refreshToken: string, userId: string, profileImage?: string }>
+  WSBaseResponse<"Authentication", "AUTH_TOKENS", { accessToken: string, refreshToken: string, user: IPassUser }>
+  | WSBaseResponse<"Authentication", "ACCESS_TOKEN", { accessToken: string, user: IPassUser }>
+  | WSBaseResponse<"Authentication", "REFRESH_TOKEN", { refreshToken: string, user: IPassUser }>
 
 // UNION TYPE FOR ALL RESPONSES
 export type WSClientResponse = WSAccountResponse | WSChatResponse | WSAuthentiacationResponse | WSNotificationResponse;

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:ardour_ai/app/data/models.dart';
 import 'package:ardour_ai/app/data/websocket_models.dart';
 import 'package:ardour_ai/app/data/websocket_service.dart';
 import 'package:ardour_ai/app/routes/app_pages.dart';
@@ -52,6 +53,10 @@ class AuthenticationController extends GetxController {
           "nigga for confirmation:\naccess: ${parsedData['data']['data']['accessToken']}\nrefresh: ${parsedData['data']['data']['refreshToken']}",
         );
         final storage = FlutterSecureStorage();
+        await storage.write(
+          key: "user",
+          value: jsonEncode(parsedData['data']['data']['user']),
+        );
         await storage.write(
           key: "userId",
           value: parsedData['data']['data']['userId'],
@@ -108,7 +113,6 @@ class AuthenticationController extends GetxController {
           "profileImage": photo,
           "FCMtoken": await FirebaseMessaging.instance.getToken(),
         },
-        // data: {"email": "jane.smith@example.com", "userName": "jane_smith", "profileImage": photo},
       );
 
       service.send(request);
@@ -139,7 +143,11 @@ class AuthenticationController extends GetxController {
       WSBaseRequest(
         type: WSModuleType.Authentication,
         reqType: "AUTHENTICATE_WITH_PASSWORD",
-        data: {"email": email, "password": password, "FCMtoken": await FirebaseMessaging.instance.getToken()},
+        data: {
+          "email": email,
+          "password": password,
+          "FCMtoken": await FirebaseMessaging.instance.getToken(),
+        },
       ),
     );
   }

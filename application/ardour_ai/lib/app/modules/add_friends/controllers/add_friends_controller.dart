@@ -20,6 +20,8 @@ class AddFriendsController extends GetxController {
 
   late Debouncer _debouncer;
 
+  RxBool isReady = false.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -76,6 +78,8 @@ class AddFriendsController extends GetxController {
       print("pass user parse panrathula error");
     } on Exception catch (e) {
       print("pass user parse panrathula vera error $e");
+    } finally {
+      isReady.value = true;
     }
   }
 
@@ -90,6 +94,8 @@ class AddFriendsController extends GetxController {
       print("pass user parse panrathula error");
     } on Exception catch (e) {
       print("pass user parse panrathula vera error $e");
+    } finally {
+      isReady.value = true;
     }
   }
 

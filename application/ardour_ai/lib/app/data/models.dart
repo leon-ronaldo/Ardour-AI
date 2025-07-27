@@ -34,7 +34,7 @@ class PassUser {
     return count.toString();
   }
 
-  factory PassUser.fromJSON(data) {
+  factory PassUser.fromJSON(Map data) {
     if (data['userId'] == null || data['userName'] == null) {
       throw InvalidPassUserParameters();
     }

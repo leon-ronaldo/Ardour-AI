@@ -7,7 +7,7 @@ import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ModernSearchBar extends StatefulWidget {
+class ContactSearchBar extends StatefulWidget {
   final void Function(String)? onItemTap;
   final TextEditingController textEditingController;
   final String placeHolder;
@@ -15,7 +15,7 @@ class ModernSearchBar extends StatefulWidget {
   final RxList<PassUser> searchResults;
   final RxList<PassUser> searchRecommendations;
 
-  ModernSearchBar({
+  ContactSearchBar({
     super.key,
     this.onItemTap,
     required this.textEditingController,
@@ -26,10 +26,10 @@ class ModernSearchBar extends StatefulWidget {
   });
 
   @override
-  State<ModernSearchBar> createState() => _ModernSearchBarState();
+  State<ContactSearchBar> createState() => _ContactSearchBarState();
 }
 
-class _ModernSearchBarState extends State<ModernSearchBar>
+class _ContactSearchBarState extends State<ContactSearchBar>
     with TickerProviderStateMixin {
   final FocusNode focusNode = FocusNode();
 
@@ -92,16 +92,16 @@ class _ModernSearchBarState extends State<ModernSearchBar>
     return InkWell(
       onTap: () => widget.onItemTap?.call(item.userId),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           children: [
             const SizedBox(width: 6),
-            SVGIcon("search")..width = 16,
+            SVGIcon("search")..width = 14,
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 item.userName,
-                style: GoogleFonts.poppins(fontSize: 14),
+                style: GoogleFonts.poppins(fontSize: 12),
               ),
             ),
           ],
@@ -136,14 +136,13 @@ class _ModernSearchBarState extends State<ModernSearchBar>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 10),
                       Text(
                         widget.searchResults.isEmpty
                             ? "Recommended Accounts"
                             : "Search Results",
-                        style: GoogleFonts.poppins(fontSize: 16),
+                        style: GoogleFonts.poppins(fontSize: 14),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 5),
                       ...(widget.searchResults.isEmpty
                               ? widget.searchRecommendations
                               : widget.searchResults)
@@ -154,7 +153,7 @@ class _ModernSearchBarState extends State<ModernSearchBar>
                 )
                 ..width = MainController.size.width
                 ..pt = 70
-                ..pb = 20
+                ..pb = 15
                 ..px = 20
                 ..borderRadius = BorderRadius.circular(30)
                 ..alignment = Alignment.centerLeft
@@ -172,7 +171,7 @@ class _ModernSearchBarState extends State<ModernSearchBar>
                   width: MainController.size.width,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 15,
-                    vertical: 3,
+                    vertical: 0,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -187,18 +186,18 @@ class _ModernSearchBarState extends State<ModernSearchBar>
                   ),
                   child: Row(
                     children: [
-                      SVGIcon("search")..width = 20,
+                      SVGIcon("search")..width = 16,
                       const SizedBox(width: 12),
                       Expanded(
                         child: TextField(
                           focusNode: focusNode,
                           controller: widget.textEditingController,
-                          style: GoogleFonts.poppins(fontSize: 14),
+                          style: GoogleFonts.poppins(fontSize: 12),
                           cursorColor: AppColors.statusBorder,
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            hintText: widget.placeHolder ?? "Search...",
-                            hintStyle: GoogleFonts.poppins(fontSize: 14),
+                            hintText: widget.placeHolder,
+                            hintStyle: GoogleFonts.poppins(fontSize: 12),
                           ),
                         ),
                       ),

@@ -1,5 +1,6 @@
 import 'package:ardour_ai/app/utils/theme/colors.dart';
 import 'package:ardour_ai/app/utils/widgets/drawables.dart';
+import 'package:ardour_ai/app/utils/widgets/error_display.dart';
 import 'package:ardour_ai/app/utils/widgets/navbars.dart';
 import 'package:ardour_ai/app/utils/widgets/profile_badges.dart';
 import 'package:ardour_ai/main.dart';
@@ -31,13 +32,17 @@ class NotificationsPageView extends GetView<NotificationsPageController> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            FTContainer(
-                              child: Text(
-                                "Friend Requests",
-                                style: GoogleFonts.poppins(fontSize: 20),
+                            if (controller.accountRequestNotifications.isEmpty)
+                              ErrorDisplay(
+                                title: "No notifications yet",
+                                subTitle:
+                                    "Your notifications will appear here once you have recieved it.",
+                                helperText: "Missing Notifications?",
+                                actionLabel: "Get notification history",
+                                svgAsset: "postbox",
                               ),
-                            )..pl = 20,
 
+                            // notifications
                             FTContainer(
                                 child: Column(
                                   children: [

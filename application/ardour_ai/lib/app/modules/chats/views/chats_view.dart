@@ -5,6 +5,7 @@ import 'package:ardour_ai/app/utils/widgets/chat_widgets.dart';
 import 'package:ardour_ai/app/utils/widgets/drawables.dart';
 import 'package:ardour_ai/app/utils/widgets/navbars.dart';
 import 'package:ardour_ai/app/utils/widgets/profile_badges.dart';
+import 'package:ardour_ai/app/utils/widgets/search_bars.dart';
 import 'package:ardour_ai/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
@@ -34,6 +35,17 @@ class ChatsView extends GetView<ChatsController> {
                     () => Column(
                       children: [
                         ChatPageNavbar(),
+                        ContactSearchBar(
+                          textEditingController:
+                              controller.searchContactController,
+                          searchResults: controller.filteredContacts,
+                          searchRecommendations: controller.matchedContacts,
+                          margin: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 12,
+                          ),
+                          placeHolder: "Search Contacts",
+                        ),
                         FTContainer(
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,

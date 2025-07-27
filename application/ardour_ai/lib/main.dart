@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:ui';
 
+import 'package:ardour_ai/app/data/models.dart';
 import 'package:ardour_ai/app/data/storage_service.dart';
 import 'package:ardour_ai/app/data/websocket_service.dart';
 import 'package:ardour_ai/firebase_notifications.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app/routes/app_pages.dart';
 
@@ -20,6 +23,9 @@ void main() async {
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.dumpErrorToConsole(details);
   };
+
+  // await FlutterSecureStorage().deleteAll();
+
   PlatformDispatcher.instance.onError = (error, stack) {
     print("Caught unhandled error: $error");
     return true;
@@ -29,6 +35,9 @@ void main() async {
       title: "Application",
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
+      theme: ThemeData(
+        textTheme: GoogleFonts.poppinsTextTheme()
+      ),
       initialBinding: BindingsBuilder(() {
         Get.put(MainController());
       }),
@@ -56,9 +65,9 @@ class MainController {
   static Future<String?> get refreshToken async =>
       await storage.read(key: "refreshToken");
 
-  static Future<String?> get userId async => await storage.read(key: "userId");
-  static Future<String?> get profileImage async =>
-      await storage.read(key: "profileImage");
+  static Future<PassUser?> get user async => PassUser.fromJSON(
+    jsonDecode(await MainController.storage.read(key: "user") ?? "{}"),
+  );
 
   // ws service
   static final WebSocketService service = WebSocketService();

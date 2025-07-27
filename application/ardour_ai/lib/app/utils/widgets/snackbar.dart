@@ -1,6 +1,7 @@
 import 'package:ardour_ai/app/utils/theme/colors.dart';
 import 'package:ardour_ai/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -92,13 +93,15 @@ class _CustomSnackBarState extends State<CustomSnackBar>
                       Text(
                         widget.title,
                         style: GoogleFonts.notoSans(
-                          fontSize: 20,
+                          fontSize: 16,
                           color: Colors.black,
                         ),
                       ),
-                      Text(
-                        widget.message,
-                        style: TextStyle(fontSize: 13, color: Colors.black),
+                      FTContainer(
+                        child: Text(
+                          widget.message,
+                          style: TextStyle(fontSize: 12, color: Colors.black),
+                        ),
                       ),
                     ],
                   ),

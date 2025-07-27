@@ -4,19 +4,28 @@ import 'package:ardour_ai/app/data/models.dart';
 import 'package:ardour_ai/app/data/storage_service.dart';
 import 'package:ardour_ai/app/data/websocket_models.dart';
 import 'package:ardour_ai/main.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 class ChatsController extends GetxController {
   RxList<PassUser> contacts = <PassUser>[].obs;
   RxList<ContactWithPreview> recentChatsList = <ContactWithPreview>[].obs;
+  RxList<PassUser> filteredContacts = <PassUser>[].obs;
+  RxList<PassUser> matchedContacts = <PassUser>[].obs;
 
   RxBool isReady = false.obs;
+
+  final TextEditingController searchContactController = TextEditingController();
 
   @override
   void onInit() {
     super.onInit();
     fetchContacts();
     fetchRecentChatsList();
+
+    searchContactController.addListener(() {
+      searchContacts(searchContactController.text.trim().toLowerCase());
+    });
   }
 
   fetchRecentChatsList() {
@@ -101,7 +110,18 @@ class ChatsController extends GetxController {
     });
 
     recentChatsList.assignAll(newRecentChatsList);
-
+    matchedContacts.value =
+        recentChatsList
+            .sublist(0, 5 > recentChatsList.length ? recentChatsList.length : 5)
+            .map((item) => item.contact)
+            .toList();
     isReady.value = true;
+  }
+
+  searchContacts(String phrase) {
+    filteredContacts.value = [];
+    for (var contact in contacts) {
+      if (contact.userName.contains(phrase)) filteredContacts.add(contact);
+    }
   }
 }

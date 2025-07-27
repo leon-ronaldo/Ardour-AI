@@ -200,7 +200,7 @@ async function getAccountsRecommendation(responseHandler: WebSocketResponder, me
         type: "Account",
         resType: "RECOMMENDED_ACCOUNTS_LIST",
         data: {
-            recommendedUsers: recommended.map((user: IUser) => ({ userName: user.username, userId: user._id.toString(), profileImage: user.image }))
+            recommendedUsers: (recommended.length < 5 ? allAccounts.slice(0, 10) : recommended).map((user: IUser) => ({ userName: user.username, userId: user._id.toString(), profileImage: user.image }))
         }
     }
 
@@ -333,9 +333,22 @@ export async function getRecentChatsList(responseHandler: WebSocketResponder) {
         participants: userIdStr,
     }).lean();
 
+    // Load full user objects for all contacts
+    const users = await UserModel.find({
+        _id: { $in: contacts },
+    }).lean();
+
     if (chatPools.length === 0) {
+        response.data.recentChats = users.map(c => ({
+            contact: {
+                userName: c.username,
+                userId: c._id.toString()
+            }, recentMessages: []
+        }))
         responseHandler.sendData(response);
         return;
+
+
     }
 
     // Build a map for quick lookup
@@ -344,12 +357,6 @@ export async function getRecentChatsList(responseHandler: WebSocketResponder) {
         const otherId = chat.participants.find((id) => id !== userIdStr)!;
         chatMap.set(otherId, chat);
     }
-
-    // Load full user objects for all contacts
-    const users = await UserModel.find({
-        _id: { $in: contacts },
-    }).lean();
-
     // Define contact structure with optional messages
     const result: ContactWithPreview[] = [];
 

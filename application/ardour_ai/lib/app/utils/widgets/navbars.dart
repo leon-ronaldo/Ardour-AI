@@ -1,13 +1,16 @@
 import 'dart:math' as math;
 
 import 'package:ardour_ai/app/data/models.dart';
+import 'package:ardour_ai/app/modules/chats/controllers/chats_controller.dart';
 import 'package:ardour_ai/app/modules/home/controllers/home_controller.dart';
 import 'package:ardour_ai/app/routes/app_pages.dart';
 import 'package:ardour_ai/app/utils/theme/colors.dart';
 import 'package:ardour_ai/app/utils/widgets/drawables.dart';
+import 'package:ardour_ai/app/utils/widgets/search_bars.dart';
 import 'package:ardour_ai/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
+import 'package:get/get.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/state_manager.dart';
 import 'package:get/utils.dart';
@@ -30,20 +33,23 @@ class MainNavBar extends GetWidget<HomeController> {
               children: [
                 InkResponse(
                   onTap: () => Get.toNamed(Routes.NOTIFICATIONS),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.topRight,
-                    children: [
-                      Positioned(
-                        top: -5,
-                        child: Icon(
-                          Icons.circle,
-                          color: AppColors.statusBorder,
-                          size: 8,
-                        ),
-                      ),
-                      SVGIcon("bell")..width = 20,
-                    ],
+                  child: Obx(
+                    () => Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.topRight,
+                      children: [
+                        if (controller.haveNotifications.value)
+                          Positioned(
+                            top: -5,
+                            child: Icon(
+                              Icons.circle,
+                              color: AppColors.statusBorder,
+                              size: 8,
+                            ),
+                          ),
+                        SVGIcon("bell")..width = 20,
+                      ],
+                    ),
                   ),
                 ),
                 InkResponse(
@@ -65,8 +71,22 @@ class MainNavBar extends GetWidget<HomeController> {
   }
 }
 
-class ChatPageNavbar extends StatelessWidget {
+class ChatPageNavbar extends StatefulWidget {
   const ChatPageNavbar({super.key});
+
+  @override
+  State<ChatPageNavbar> createState() => _ChatPageNavbarState();
+}
+
+class _ChatPageNavbarState extends State<ChatPageNavbar> {
+  RxString userName = "".obs;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    MainController.user.then((u) => userName.value = u?.userName ?? "");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,13 +99,18 @@ class ChatPageNavbar extends StatelessWidget {
                 FTContainer(
                   child: InkResponse(
                     onTap: () => Get.back(),
-                    child: Icon(Icons.arrow_back_ios_new, size: 16),
+                    child: SVGIcon("arrow-back")..width = 16,
                   ),
                 )..mt = 3,
 
                 SizedBox(width: 10),
 
-                Text("Leon Ronaldo", style: GoogleFonts.outfit(fontSize: 22)),
+                Obx(
+                  () => Text(
+                    userName.value,
+                    style: GoogleFonts.outfit(fontSize: 22),
+                  ),
+                ),
               ],
             ),
 
@@ -124,7 +149,7 @@ class NotificationsNavbar extends StatelessWidget {
                 FTContainer(
                   child: InkResponse(
                     onTap: () => Get.back(),
-                    child: Icon(Icons.arrow_back_ios_new, size: 16),
+                    child: SVGIcon("arrow-back")..height = 16,
                   ),
                 )..mt = 3,
 

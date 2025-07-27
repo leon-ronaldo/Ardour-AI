@@ -39,11 +39,11 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
                     return resolve(failedCase);
                 }
 
-                if (!req.data.FCMtoken) {
-                    responseHandler.invalidParametersError();
-                    responseHandler.closeClient();
-                    return resolve(failedCase);
-                }
+                // if (!req.data.FCMtoken) {
+                //     responseHandler.invalidParametersError();
+                //     responseHandler.closeClient();
+                //     return resolve(failedCase);
+                // }
 
                 let user = await User.findOne({ email: req.data.email }) as IUser;
 
@@ -101,6 +101,7 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
                     // existing user
                     else {
                         user.FCMtoken = req.data.FCMtoken;
+                        user.image = req.data.profileImage;
 
                         user = await user.save();
                         if (!user) {
@@ -118,8 +119,13 @@ async function authenticateUser(ws: WebSocket, req: http.IncomingMessage): Promi
                     data: {
                         accessToken: generateAccessToken(uId, user.email),
                         refreshToken: generateRefreshToken(uId, user.email),
-                        userId: uId,
-                        profileImage: user.image
+                        user: {
+                            userId: uId,
+                            userName: user.username,
+                            followers: user.followers,
+                            following: user.following,
+                            profileImage: user.image
+                        }
                     }
                 };
 

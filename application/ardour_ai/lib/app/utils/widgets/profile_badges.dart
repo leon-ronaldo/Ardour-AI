@@ -65,7 +65,7 @@ class ProfileStatusBadge extends FTContainer {
   }) {
     if (isUser) {
       isLoading.value = true;
-      _loadImage();
+      _loadUserImage();
     } else {
       loadedImage.value = image;
     }
@@ -79,9 +79,11 @@ class ProfileStatusBadge extends FTContainer {
   final RxBool isLoading = false.obs;
   final RxString loadedImage = "".obs;
 
-  void _loadImage() async {
-    final img = await MainController.profileImage;
-    loadedImage.value = img ?? "assets/images/sample/raul.jpg";
+  void _loadUserImage() async {
+    final user = await MainController.user;
+
+    loadedImage.value = user?.profileImage ??
+        "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541";
     isLoading.value = false;
   }
 

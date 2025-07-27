@@ -78,12 +78,14 @@ class PersonalChatController extends GetxController {
   }
 
   void initialize() async {
-    userId = await MainController.userId;
+    final user = await MainController.user;
 
-    if (userId == null) {
+    if (user == null) {
       Get.offAllNamed(Routes.AUTHENTICATION);
       return;
     }
+
+    userId = user.userId;
 
     listenData();
     fetchMessages();
@@ -169,6 +171,8 @@ class PersonalChatController extends GetxController {
 
       if (parsedData['data'] != null) {
         final coreData = parsedData['data'];
+        print("nan thaan coolie");
+        print(coreData);
 
         if (coreData['type'] == WSModuleType.Account) {
           switch (coreData['resType']) {
